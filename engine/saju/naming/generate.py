@@ -114,6 +114,49 @@ def name_to_improve_compat(self_chart: Chart, partner_chart: Chart, gender: str,
     }
 
 
+def couple_names(self_chart: Chart, partner_chart: Chart, self_gender: str,
+                 partner_gender: str, self_name: str | None = None,
+                 partner_name: str | None = None, top: int = 3) -> dict:
+    """둘만의 인연 이름: 각자 이름이 '상대가 부족한 오행'을 담아 서로를 채운다.
+
+    컨셉 — 개명이 아니라 '둘만의 애칭'. 서로를 부르면 상대의 없는 기운을 소리로
+    채워줌 → 이름 오행/조화 레이어가 튜닝됨. 정직: 일간·띠는 못 바꿈, 조화 레이어만.
+    """
+    base = compatibility(self_chart, partner_chart)
+    self_target = target_element(partner_chart)   # 내 이름 = 상대의 부족 오행
+    partner_target = target_element(self_chart)    # 상대 이름 = 나의 부족 오행
+
+    def _pick(gender: str, target: Element, orig: str | None):
+        cands = [n for n in names_by_gender(gender) if n.supplies(target)]
+        if orig:
+            oe = foreign_first_element(orig)
+            cands.sort(key=lambda n: (n.first_element is not oe,))
+        return (cands[0] if cands else None), cands[:top]
+
+    self_best, self_cands = _pick(self_gender, self_target, self_name)
+    partner_best, partner_cands = _pick(partner_gender, partner_target, partner_name)
+
+    both_ok = bool(self_best and partner_best)
+    both = display_score(base.raw + 2 * _NAME_HARMONY_BONUS) if both_ok else base.score
+
+    def _card(best, cands, target, for_whom):
+        if not best:
+            return None
+        d = {"hangul": best.hangul, "hanja": best.hanja, "meaning": best.meaning,
+             "target_element": target, "candidates": [c.hangul for c in cands]}
+        d["blurb_en"] = (f"{best.hangul} carries {target.en} — the element "
+                         f"{for_whom} is missing.")
+        return d
+
+    return {
+        "base_score": base.score,
+        "both_boosted": both,
+        "both_tier": tier(both),
+        "self_card": _card(self_best, self_cands, self_target, "your partner"),
+        "partner_card": _card(partner_best, partner_cands, partner_target, "you"),
+    }
+
+
 def koreanize(given_name: str, chart: Chart, top: int = 3) -> dict:
     """무료 유입: 이름은 그대로 두고 사주 매칭 한국 성만 붙임 (예: 김 Taylor)."""
     target = target_element(chart)

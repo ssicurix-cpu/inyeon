@@ -53,6 +53,15 @@ h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-he
 .lrow.hot{background:rgba(232,200,108,.1)}
 .lrow.hot b{color:var(--gold)}
 .sendcta{display:block;text-align:center;border:1px solid var(--gold);color:var(--gold);font-weight:600;padding:13px;border-radius:40px;margin-top:12px;text-decoration:none;font-size:14px}
+.couple{margin-top:22px;border:1px solid var(--line);border-radius:16px;padding:18px;background:linear-gradient(180deg,rgba(232,200,108,.06),rgba(200,80,90,.05))}
+.couple .eyebrow{margin-bottom:4px}
+.cnames{display:flex;gap:12px;margin:14px 0}
+.cname{flex:1;text-align:center;border:1px solid var(--line);border-radius:12px;padding:14px 8px;background:#0f1124}
+.cname .kr{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);font-weight:600;line-height:1.1}
+.cname .hj{font-size:14px;color:var(--muted);margin-top:2px}
+.cname .who{font-size:11px;color:var(--dim);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.cname .mean{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.4}
+.cthread{text-align:center;color:var(--gold);font-size:18px;margin:2px 0}
 .cta{display:block;text-align:center;background:var(--gold);color:#231b03;font-weight:600;padding:14px;border-radius:40px;margin-top:22px;text-decoration:none}
 .sec{margin-top:24px}
 .askbox{display:flex;gap:8px;margin-top:8px}
@@ -145,6 +154,31 @@ def render_result(data: dict) -> str:
                         f'<b>{rec["both_boosted"]}% · {rec["both_tier"]}</b></div></div>')
             html.append(f'<a class="sendcta" href="#">Send this to {pname} → reach '
                         f'{rec["both_boosted"]}% together</a>')
+        cpl = data.get("couple_names")
+        if cpl and cpl.get("self_card") and cpl.get("partner_card"):
+            you = data.get("name") or "You"
+            them = data.get("partner_name") or "Them"
+            sc, pc = cpl["self_card"], cpl["partner_card"]
+            html.append('<div class="couple">')
+            html.append('<div class="eyebrow">Your couple name — become each other\'s missing element</div>')
+            html.append('<div class="cnames">'
+                        f'<div class="cname"><div class="who">{you}</div>'
+                        f'<div class="kr">{sc["hangul"]}</div>'
+                        + (f'<div class="hj">{sc["hanja"]}</div>' if sc.get("hanja") else '')
+                        + f'<div class="mean">carries <b style="color:var(--jade)">{sc["target_element"].en}</b> — what {them} is missing</div></div>'
+                        '<div class="cthread">❤</div>'
+                        f'<div class="cname"><div class="who">{them}</div>'
+                        f'<div class="kr">{pc["hangul"]}</div>'
+                        + (f'<div class="hj">{pc["hanja"]}</div>' if pc.get("hanja") else '')
+                        + f'<div class="mean">carries <b style="color:var(--jade)">{pc["target_element"].en}</b> — what {you} is missing</div></div>'
+                        '</div>')
+            html.append('<div class="reading" style="font-size:16px;margin:6px 0 0">'
+                        'You don\'t have to make it official. Use them as your private pet names — '
+                        'just the two of you. In saju, speaking your partner\'s missing element out loud, '
+                        'every day, is how two people slowly tune into one.</div>')
+            html.append(f'<div class="hint">This tunes your <b>name-harmony layer</b>, not your birth-fixed fate — '
+                        f'try it for fun. Deep couple report & authenticated naming coming soon.</div>')
+            html.append('</div>')
         html.append('</div>')
 
     inp = data.get("inputs") or {}

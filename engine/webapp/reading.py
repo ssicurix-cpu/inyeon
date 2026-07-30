@@ -8,7 +8,7 @@ from datetime import datetime
 from saju.place import chart_for_city, CITIES
 from saju.interpret import Persona, render_reading, render_compat
 from saju.compat import compatibility
-from saju.naming import name_to_improve_compat
+from saju.naming import name_to_improve_compat, couple_names
 from saju.daily import daily_energy
 from saju.ritual import missing_ritual
 
@@ -17,7 +17,7 @@ PERSONA_MAP = {"warm": Persona.WARM, "blunt": Persona.BLUNT, "mystic": Persona.M
 
 def build_reading(local_dt: datetime, city: str, gender: str, persona_key: str,
                   name: str | None = None, partner: dict | None = None) -> dict:
-    """솔로(+선택적 궁합) 리딩. name=본인 이름(헤더·작명), partner={dt, city, name}."""
+    """솔로(+선택적 궁합) 리딩. name=본인 이름(헤더·작명), partner={dt, city, name, gender}."""
     persona = PERSONA_MAP.get(persona_key, Persona.WARM)
     chart = chart_for_city(local_dt, city)
     data = {
@@ -36,11 +36,16 @@ def build_reading(local_dt: datetime, city: str, gender: str, persona_key: str,
         comp = compatibility(chart, pchart)
         rec = name_to_improve_compat(chart, pchart, gender=gender,
                                      original_name=name)
+        pgender = (partner.get("gender") or "F")
+        couple = couple_names(chart, pchart, self_gender=gender,
+                              partner_gender=pgender, self_name=name,
+                              partner_name=partner.get("name"))
         data.update({
             "partner_chart": pchart,
             "partner_name": (partner.get("name") or "").strip() or None,
             "compat": comp,
             "compat_text": render_compat(chart, pchart, persona, name_rec=rec),
             "name_rec": rec,
+            "couple_names": couple,
         })
     return data

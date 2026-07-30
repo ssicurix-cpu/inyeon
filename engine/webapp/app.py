@@ -57,7 +57,8 @@ details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}
     <div class="row"><div><label>Their birth date</label><input type="date" name="p_date"></div>
     <div><label>Time</label><input type="time" name="p_time"></div></div>
     <label>Their city</label><select name="p_city"><option value=""></option>{_CITY_OPTS}</select>
-    <label>Their name (optional)</label><input name="p_name" placeholder="Jihoon">
+    <div class="row"><div><label>Their name (optional)</label><input name="p_name" placeholder="Jihoon"></div>
+    <div><label>Their gender (for name)</label><select name="p_gender"><option value="M">Male</option><option value="F">Female</option></select></div></div>
   </details>
   <button type="submit">Reveal my reading</button>
 </form></body></html>"""
@@ -85,12 +86,12 @@ def healthz():
 def reading(date: str = Form(...), time: str = Form(...), city: str = Form(...),
             gender: str = Form("F"), persona: str = Form("warm"), name: str = Form(""),
             p_date: str = Form(""), p_time: str = Form(""), p_city: str = Form(""),
-            p_name: str = Form("")):
+            p_name: str = Form(""), p_gender: str = Form("M")):
     dt = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
     partner = None
     if p_date and p_time and p_city:
         partner = {"dt": datetime.strptime(f"{p_date} {p_time}", "%Y-%m-%d %H:%M"),
-                   "city": p_city, "name": p_name or None}
+                   "city": p_city, "name": p_name or None, "gender": p_gender}
     data = build_reading(dt, city, gender, persona, name=name, partner=partner)
     return render_result(data)
 
