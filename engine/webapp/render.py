@@ -231,7 +231,7 @@ def render_card(data: dict) -> str:
             h.append(f'<div class="tease">Both get your Korean names to unlock '
                      f'〈{rec["both_tier"]}〉 — find out how high ✨</div>')
         h.append('</div>')
-        h.append(f'<div class="wm">what\'s your inyeon? · <b>inyeon.app</b></div>')
+        h.append(f'<div class="wm">what\'s your inyeon? · <b>inyeon.onrender.com</b></div>')
     else:
         miss = c.lacking[0] if c.lacking else c.dominant
         h.append('<div class="mid">')
@@ -242,7 +242,7 @@ def render_card(data: dict) -> str:
         h.append(_mini_bars(c.element_counts))
         h.append('<div class="line">The one energy I\'m missing — my growth edge.</div>')
         h.append('</div>')
-        h.append(f'<div class="wm">what\'s yours? · <b>inyeon.app</b></div>')
+        h.append(f'<div class="wm">what\'s yours? · <b>inyeon.onrender.com</b></div>')
 
     h.append('</div></body></html>')
     return "".join(h)
