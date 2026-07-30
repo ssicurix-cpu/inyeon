@@ -145,12 +145,10 @@ def render_result(data: dict) -> str:
         rec = data.get("name_rec")
         pname = data.get("partner_name") or "them"
         if rec and rec.get("best"):
-            html.append(f'<div class="missing">Your Korean name <b>{rec["best"].hangul}</b> '
-                        f'(adds {rec["harmonizing_element"].en}) tunes the harmony between you.</div>')
             html.append('<div class="ladder">'
                         f'<div class="lrow"><span>Right now</span><b>{rec["base_score"]}%</b></div>'
-                        f'<div class="lrow"><span>+ your Korean name</span><b>{rec["boosted_score"]}%</b></div>'
-                        f'<div class="lrow hot"><span>+ {pname}\'s Korean name too</span>'
+                        f'<div class="lrow"><span>+ your couple name</span><b>{rec["boosted_score"]}%</b></div>'
+                        f'<div class="lrow hot"><span>+ {pname}\'s couple name too</span>'
                         f'<b>{rec["both_boosted"]}% · {rec["both_tier"]}</b></div></div>')
             html.append(f'<a class="sendcta" href="#">Send this to {pname} → reach '
                         f'{rec["both_boosted"]}% together</a>')
