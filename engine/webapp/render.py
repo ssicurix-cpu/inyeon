@@ -162,7 +162,7 @@ def render_result(data: dict) -> str:
                         f'<div class="lrow"><span>+ your couple name</span><b>{rec["boosted_score"]}%</b></div>'
                         f'<div class="lrow hot"><span>+ {pname}\'s couple name too</span>'
                         f'<b>{rec["both_boosted"]}% · {rec["both_tier"]}</b></div></div>')
-            html.append(f'<a class="sendcta" href="#">Send this to {pname} → reach '
+            html.append(f'<a class="sendcta" href="javascript:void(0)" onclick="shareInyeon()">Send this to {pname} → reach '
                         f'{rec["both_boosted"]}% together</a>')
         cpl = data.get("couple_names")
         if cpl and cpl.get("self_card") and cpl.get("partner_card"):
@@ -202,8 +202,12 @@ def render_result(data: dict) -> str:
                 'const a=document.getElementById("ans");a.style.display="block";a.textContent="…";'
                 'const f=new URLSearchParams(Object.assign({},I,{question:q}));'
                 'const res=await fetch("/ask",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});'
-                'const j=await res.json();a.textContent=j.text;};</script>')
-    html.append('<a class="cta" href="#">Get your Korean destiny name</a>')
+                'const j=await res.json();a.textContent=j.text;};'
+                'function shareInyeon(){const u="https://inyeon.onrender.com";'
+                'if(navigator.share){navigator.share({title:"Inyeon",text:"What\\u2019s your Inyeon? Korean saju & compatibility",url:u});}'
+                'else{navigator.clipboard&&navigator.clipboard.writeText(u);alert("Link copied — send it to them!");}}'
+                '</script>')
+    html.append('<a class="cta" href="/signup">Get your Korean destiny name →</a>')
     html.append('</div>')
     html.append(_PAGE_FOOT)
     return "".join(html)
