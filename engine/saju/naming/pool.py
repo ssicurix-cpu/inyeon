@@ -113,6 +113,24 @@ SEED_NAMES: list[NameEntry] = [
     NameEntry("예린", "F", "睿潾"),
     NameEntry("소율", "F", "昭律"),
     NameEntry("지아", "F", "智娥"),
+    # 확장 (검증된 한자 재조합)
+    NameEntry("우진", "M", "宇珍"),
+    NameEntry("준우", "M", "俊宇"),
+    NameEntry("도현", "M", "道炫"),
+    NameEntry("태준", "M", "泰俊"),
+    NameEntry("은호", "M", "恩昊"),
+    NameEntry("지건", "M", "智健"),
+    NameEntry("서은", "F", "瑞恩"),
+    NameEntry("지은", "F", "智恩"),
+    NameEntry("예은", "F", "睿恩"),
+    NameEntry("유나", "F", "有娜"),
+    NameEntry("서아", "F", "瑞娥"),
+    NameEntry("지수", "F", "智洙"),
+    NameEntry("소은", "F", "昭恩"),
+    NameEntry("나은", "F", "娜恩"),
+    NameEntry("하윤", "F", "河潤"),
+    NameEntry("서윤", "F", "瑞潤"),
+    NameEntry("지윤", "F", "智潤"),
 ]
 
 # 성(姓) 표: 발음오행은 코드로 계산. 인기순 근사 정렬.

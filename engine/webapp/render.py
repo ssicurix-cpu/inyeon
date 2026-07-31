@@ -49,6 +49,15 @@ h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-he
 .reader span{font-size:13px;color:var(--gold);letter-spacing:.02em}
 .namenudge{background:rgba(232,200,108,.08);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
 .namenudge a{color:var(--gold);text-decoration:none;font-weight:600;white-space:nowrap}
+.pname{margin-top:24px;border:1px solid var(--gold);border-radius:16px;padding:20px;background:linear-gradient(180deg,rgba(232,200,108,.07),rgba(232,200,108,.02))}
+.pn-hangul{font-family:'Cormorant Garamond',serif;font-size:46px;color:var(--gold);font-weight:600;line-height:1;text-align:center}
+.pn-hanja{font-size:22px;color:var(--muted);text-align:center;margin-top:2px}
+.pn-rows{margin:16px 0 12px}
+.pn-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.pn-row:first-child{border-top:none}
+.pn-row .c{font-size:28px;color:var(--text);width:34px;text-align:center}
+.pn-row .m{flex:1;color:var(--muted)}
+.pn-row .e{color:var(--jade);font-weight:600;white-space:nowrap;font-size:12px}
 .hint{font-size:12px;color:var(--dim);line-height:1.55;margin-top:8px}
 .hint b{color:var(--muted);font-weight:500}
 .compat{margin-top:26px;border-top:1px solid var(--line);padding-top:22px}
@@ -210,7 +219,21 @@ def render_result(data: dict) -> str:
                 'if(navigator.share){navigator.share({title:"Inyeon",text:"What\\u2019s your Inyeon? Korean saju & compatibility",url:u});}'
                 'else{navigator.clipboard&&navigator.clipboard.writeText(u);alert("Link copied — send it to them!");}}'
                 '</script>')
-    html.append('<a class="cta" href="/signup">Get your Korean destiny name →</a>')
+    pn = data.get("premium_name")
+    if pn:
+        rows = "".join(
+            f'<div class="pn-row"><span class="c">{b["char"]}</span>'
+            f'<span class="m">{b.get("meaning") or ""}</span>'
+            f'<span class="e">{("자원오행 " + b["element"]) if b.get("element") else ""}</span></div>'
+            for b in pn.get("breakdown", []))
+        html.append('<div class="pname"><div class="eyebrow">Your Korean destiny name — from your missing element</div>'
+                    f'<div class="pn-hangul">{pn["hangul"]}</div>'
+                    + (f'<div class="pn-hanja">{pn["hanja"]}</div>' if pn.get("hanja") else '')
+                    + f'<div class="pn-rows">{rows}</div>'
+                    + f'<div class="reading" style="font-size:15px;margin:0">{pn["reasoning_en"]}</div>'
+                    '<div class="hint" style="margin-top:10px">This is your free preview. '
+                    'The full authenticated name card (hanja calligraphy, deeper meaning &amp; a keepsake) is coming.</div></div>')
+    html.append('<a class="cta" href="/signup">Get your full Korean name card →</a>')
     html.append('</div>')
     html.append(_PAGE_FOOT)
     return "".join(html)

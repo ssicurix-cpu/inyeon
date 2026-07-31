@@ -21,7 +21,7 @@ def _chart(dt, city, tz, lng):
         return chart_for_city(dt, "Seoul")
 from saju.interpret import Persona, render_reading, render_compat
 from saju.compat import compatibility
-from saju.naming import name_to_improve_compat, couple_names
+from saju.naming import name_to_improve_compat, couple_names, premium_korean_name
 from saju.daily import daily_energy
 from saju.ritual import missing_ritual
 
@@ -46,6 +46,9 @@ def build_reading(local_dt: datetime, city: str, gender: str, persona_key: str,
                    "city": city, "gender": gender, "persona": persona_key,
                    "tz": tz or "", "lng": lng if lng not in (None, "") else ""},
     }
+    nm = (name or "").strip()
+    if nm:
+        data["premium_name"] = premium_korean_name(chart, gender, nm).get("card")
     if partner and partner.get("dt") and (partner.get("tz") or partner.get("city")):
         pchart = _chart(partner["dt"], partner.get("city"), partner.get("tz"), partner.get("lng"))
         comp = compatibility(chart, pchart)

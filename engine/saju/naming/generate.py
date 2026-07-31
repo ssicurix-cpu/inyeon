@@ -36,13 +36,38 @@ def premium_korean_name(chart: Chart, gender: str, original_name: str,
 
     picks = candidates[:top]
     best = picks[0] if picks else None
+    card = None
+    if best:
+        card = {
+            "hangul": best.hangul,
+            "hanja": best.hanja,
+            "meaning": best.meaning,
+            "breakdown": [  # 글자별 한자·뜻·자원오행 (유료 풀 네임 카드)
+                {"char": b["char"], "meaning": b["meaning"],
+                 "element": b["element"].en if b["element"] else None}
+                for b in best.hanja_breakdown
+            ],
+            "sound_elements": [e.en for e in best.sound_elements],
+            "target_element": target.en,
+            "reasoning_en": _reason_en(best, target, original_name),
+        }
     return {
         "target_element": target,
         "original_name": original_name,
         "candidates": picks,
         "best": best,
+        "card": card,
         "reasoning": _reason(best, target, original_name) if best else None,
     }
+
+
+def _reason_en(name: NameEntry, target: Element, original: str) -> str:
+    s = (f"Inspired by the sound of “{original}”, we chose a name that pours in "
+         f"{target.en} — the element your chart lacks.")
+    if name.hanja:
+        s += f" In hanja {name.hanja} means “{name.meaning}”."
+    s += " Crafted the traditional 오행 way (for self-discovery, not fixed fate)."
+    return s
 
 
 def _reason(name: NameEntry, target: Element, original: str) -> str:
