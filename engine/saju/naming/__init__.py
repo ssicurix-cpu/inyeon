@@ -3,6 +3,7 @@ from .pool import NameEntry, SEED_NAMES, SURNAMES, names_by_gender, surnames_sup
 from .generate import (
     target_element, premium_korean_name, koreanize,
     harmonizing_element, name_to_improve_compat, couple_names,
+    premium_couple_names,
 )
 
 __all__ = [
@@ -10,4 +11,5 @@ __all__ = [
     "NameEntry", "SEED_NAMES", "SURNAMES", "names_by_gender", "surnames_supplying",
     "target_element", "premium_korean_name", "koreanize",
     "harmonizing_element", "name_to_improve_compat", "couple_names",
+    "premium_couple_names",
 ]

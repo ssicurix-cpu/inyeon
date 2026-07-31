@@ -182,6 +182,60 @@ def couple_names(self_chart: Chart, partner_chart: Chart, self_gender: str,
     }
 
 
+def _premium_card(name: NameEntry, target: Element, original: str | None,
+                  whom_missing: str) -> dict:
+    """풀 프리미엄 카드 (한자·뜻·자원오행 브레이크다운 + 커플 프레임 근거)."""
+    s = (f"{name.hangul} carries {target.en} — the element {whom_missing} is missing.")
+    if name.hanja:
+        s += f" In hanja {name.hanja} means “{name.meaning}”."
+    s += " So the two of you become each other's missing element 🌙"
+    return {
+        "hangul": name.hangul,
+        "hanja": name.hanja,
+        "meaning": name.meaning,
+        "breakdown": [
+            {"char": b["char"], "meaning": b["meaning"],
+             "element": b["element"].en if b["element"] else None}
+            for b in name.hanja_breakdown
+        ],
+        "sound_elements": [e.en for e in name.sound_elements],
+        "target_element": target.en,
+        "reasoning_en": s,
+    }
+
+
+def premium_couple_names(self_chart: Chart, partner_chart: Chart, self_gender: str,
+                         partner_gender: str, self_name: str | None = None,
+                         partner_name: str | None = None, top: int = 3) -> dict:
+    """유료 커플 이름 카드: 각자 이름이 '상대의 부족 오행'을 담는 풀 프리미엄 작명.
+
+    couple_names(무료 애칭)의 프리미엄판 — 한자·뜻·자원오행 브레이크다운까지.
+    """
+    base = compatibility(self_chart, partner_chart)
+    self_target = target_element(partner_chart)   # 내 이름 = 상대의 부족 오행
+    partner_target = target_element(self_chart)    # 상대 이름 = 나의 부족 오행
+
+    def _pick(gender: str, target: Element, orig: str | None):
+        cands = [n for n in names_by_gender(gender) if n.supplies(target)]
+        if orig:
+            oe = foreign_first_element(orig)
+            cands.sort(key=lambda n: (n.first_element is not oe,))
+        return cands[0] if cands else None
+
+    self_best = _pick(self_gender, self_target, self_name)
+    partner_best = _pick(partner_gender, partner_target, partner_name)
+    both_ok = bool(self_best and partner_best)
+    both = display_score(base.raw + 2 * _NAME_HARMONY_BONUS) if both_ok else base.score
+
+    return {
+        "base_score": base.score,
+        "both_boosted": both,
+        "both_tier": tier(both),
+        "self": _premium_card(self_best, self_target, self_name, "your partner") if self_best else None,
+        "partner": _premium_card(partner_best, partner_target, partner_name, "you") if partner_best else None,
+    }
+
+
 def koreanize(given_name: str, chart: Chart, top: int = 3) -> dict:
     """무료 유입: 이름은 그대로 두고 사주 매칭 한국 성만 붙임 (예: 김 Taylor)."""
     target = target_element(chart)

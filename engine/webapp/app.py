@@ -190,8 +190,11 @@ def api_name(name: str = "", date: str = "", gender: str = "F",
     return premium_korean_name(c, gender, (name or "").strip() or "friend").get("card") or {}
 
 
-GUMROAD_PRODUCT_ID = "CL2d7BPUIAPIXCW-6InKrg=="  # paid keepsake card product
-GUMROAD_PERMALINK = "xivgqo"
+# Gumroad products keyed by slug. Fill couple id/permalink after creating the $14.99 product.
+GUMROAD_PRODUCTS = {
+    "name":   {"id": "CL2d7BPUIAPIXCW-6InKrg==", "permalink": "xivgqo"},
+    "couple": {"id": "",                          "permalink": ""},  # TODO: set after Gumroad product created
+}
 
 
 def _gumroad_verify(id_field: str, id_value: str, key: str):
@@ -210,14 +213,21 @@ def _gumroad_verify(id_field: str, id_value: str, key: str):
 
 
 @app.get("/api/verify-license")
-def verify_license(key: str = ""):
-    """Gate the paid keepsake card: verify a Gumroad license key for this product."""
+def verify_license(key: str = "", product: str = "name"):
+    """Gate paid keepsake cards: verify a Gumroad license key for the given product."""
     key = (key or "").strip()
     if not key:
         return {"ok": False}
+    prod = GUMROAD_PRODUCTS.get(product) or GUMROAD_PRODUCTS["name"]
+    checks = []
+    if prod.get("id"):
+        checks.append(("product_id", prod["id"]))
+    if prod.get("permalink"):
+        checks.append(("product_permalink", prod["permalink"]))
+    if not checks:
+        return {"ok": False}  # product not configured yet
     j = None
-    for field, value in (("product_id", GUMROAD_PRODUCT_ID),
-                         ("product_permalink", GUMROAD_PERMALINK)):
+    for field, value in checks:
         try:
             j = _gumroad_verify(field, value, key)
         except Exception:
@@ -232,8 +242,28 @@ def verify_license(key: str = ""):
     return {"ok": not bad}
 
 
+@app.get("/api/couple-name")
+def api_couple_name(name: str = "", date: str = "", gender: str = "F",
+                    time: str = "12:00", city: str = "Seoul", tz: str = "", lng: str = "",
+                    p_name: str = "", p_date: str = "", p_gender: str = "M",
+                    p_time: str = "12:00", p_city: str = "Seoul", p_tz: str = "", p_lng: str = ""):
+    """Premium couple-name card: two names, each carrying the OTHER's missing element."""
+    from saju.naming import premium_couple_names
+    if not date or not p_date:
+        return {}
+    dt = datetime.strptime(f"{date} {time or '12:00'}", "%Y-%m-%d %H:%M")
+    pdt = datetime.strptime(f"{p_date} {p_time or '12:00'}", "%Y-%m-%d %H:%M")
+    c = _chart_tz(dt, tz, lng, city)
+    pc = _chart_tz(pdt, p_tz, p_lng, p_city)
+    return premium_couple_names(
+        c, pc, self_gender=gender, partner_gender=p_gender,
+        self_name=(name or "").strip() or "you",
+        partner_name=(p_name or "").strip() or "your partner")
+
+
 _NAME_PAGE = (Path(__file__).parent / "static" / "name.html").read_text(encoding="utf-8")
 _CARD_PAGE = (Path(__file__).parent / "static" / "name_card.html").read_text(encoding="utf-8")
+_COUPLE_CARD_PAGE = (Path(__file__).parent / "static" / "couple_card.html").read_text(encoding="utf-8")
 
 
 @app.get("/name", response_class=HTMLResponse)
@@ -244,6 +274,11 @@ def name_page():
 @app.get("/card", response_class=HTMLResponse)
 def card_page():
     return _CARD_PAGE
+
+
+@app.get("/couple-card", response_class=HTMLResponse)
+def couple_card_page():
+    return _COUPLE_CARD_PAGE
 
 
 @app.get("/api/lunar")

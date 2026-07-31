@@ -199,7 +199,10 @@ def render_result(data: dict) -> str:
                         'just the two of you. In saju, speaking your partner\'s missing element out loud, '
                         'every day, is how two people slowly tune into one.</div>')
             html.append(f'<div class="hint">This tunes your <b>name-harmony layer</b>, not your birth-fixed fate — '
-                        f'try it for fun. Deep couple report & authenticated naming coming soon.</div>')
+                        f'try it for fun. Above is your free preview.</div>')
+            html.append('<a class="cta" style="margin-top:16px" '
+                        'href="https://975194505819.gumroad.com/l/COUPLE" target="_blank" rel="noopener">'
+                        'Get your couple name card — $14.99 →</a>')
             html.append('</div>')
         html.append('</div>')
 
