@@ -92,6 +92,14 @@ def healthz():
     return {"ok": True}
 
 
+_LEARN = (Path(__file__).parent / "static" / "learn.html").read_text(encoding="utf-8")
+
+
+@app.get("/learn", response_class=HTMLResponse)
+def learn():
+    return _LEARN
+
+
 @app.get("/promo/{n}", response_class=HTMLResponse)
 def promo(n: int):
     p = Path(__file__).parent / "static" / f"promo{n}.html"
