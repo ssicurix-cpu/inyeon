@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inyeon TikTok — Anchor 1 (Missing Element)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#05060f;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif}
+  /* 9:16 stage. Screen-record THIS box (1080x1920). */
+  .stage{position:relative;width:405px;height:720px;overflow:hidden;background:#05060f;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,.6)}
+  video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,15,.35),rgba(5,6,15,.15) 40%,rgba(5,6,15,.7))}
+  .cap{position:absolute;left:26px;right:26px;opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease;text-align:center}
+  .cap.show{opacity:1;transform:translateY(0)}
+  .top{top:84px}
+  .mid{top:300px}
+  .hook{font-weight:800;font-size:30px;line-height:1.18;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.85)}
+  .hook .g{color:#e8c86c}
+  .hook .jade{color:#8fe0bd}
+  .sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:24px;color:#f1f0fb;margin-top:10px;text-shadow:0 2px 14px rgba(0,0,0,.85)}
+  .cta{position:absolute;left:0;right:0;bottom:96px;text-align:center;opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .cta.show{opacity:1;transform:translateY(0)}
+  .cta .pill{display:inline-block;background:#e8c86c;color:#231b03;font-weight:800;font-size:19px;padding:12px 24px;border-radius:40px}
+  .wm{position:absolute;left:0;right:0;bottom:40px;text-align:center;color:#e8dcc0;font-size:14px;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .wm b{color:#e8c86c}
+  .brand{position:absolute;top:34px;left:0;right:0;text-align:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.06em;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .replay{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#161936;color:#e8c86c;border:1px solid #2a2d55;border-radius:30px;padding:8px 18px;font-size:13px;cursor:pointer}
+</style></head>
+<body>
+  <div class="stage" id="stage">
+    <video id="v" src="https://d8j0ntlcm91z4.cloudfront.net/user_3GGa0mUII1gOCwgWZmnTJH6OoHX/hf_20260730_231609_bf324afc-b8fa-4551-a713-437c0e93ee9e.mp4" autoplay muted loop playsinline></video>
+    <div class="veil"></div>
+    <div class="brand">☾ Inyeon</div>
+    <div class="cap top" id="c1"><div class="hook">Your star sign gives everyone the <span class="g">same</span> personality.</div></div>
+    <div class="cap top" id="c2"><div class="hook">Korean <span class="g">Saju</span> reads you as <span class="g">5 elements</span>…</div></div>
+    <div class="cap mid" id="c3"><div class="hook">and finds the <span class="jade">ONE</span> you're missing.</div><div class="sub">That's your growth key.</div></div>
+    <div class="cap top" id="c4"><div class="hook">What's <span class="jade">your</span> missing element?<br><span class="g">tag a friend</span> &amp; find out 🌙</div></div>
+    <div class="cta" id="cta"><span class="pill">inyeon.onrender.com · #MyMissingElement</span></div>
+    <div class="wm">what's your inyeon? · <b>inyeon.onrender.com</b></div>
+  </div>
+  <button class="replay" onclick="run()">▶ Replay sequence</button>
+<script>
+  // Caption timeline (ms). Video loops underneath; total ~9s then loops.
+  const steps=[
+    {el:'c1',on:200,off:2800},
+    {el:'c2',on:3000,off:5300},
+    {el:'c3',on:5500,off:8000},
+    {el:'c4',on:8200,off:11500},
+    {el:'cta',on:8800,off:11500},
+  ];
+  let timers=[];
+  function clearAll(){timers.forEach(t=>clearTimeout(t));timers=[];
+    ['c1','c2','c3','c4','cta'].forEach(id=>document.getElementById(id).classList.remove('show'));}
+  function run(){clearAll();
+    steps.forEach(s=>{const e=document.getElementById(s.el);
+      timers.push(setTimeout(()=>e.classList.add('show'),s.on));
+      timers.push(setTimeout(()=>e.classList.remove('show'),s.off));});
+    timers.push(setTimeout(run,11800)); // loop
+  }
+  document.getElementById('v').addEventListener('loadeddata',run);
+  run();
+</script>
+</body></html>

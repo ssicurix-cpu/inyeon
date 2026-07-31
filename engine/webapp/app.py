@@ -82,6 +82,14 @@ def healthz():
     return {"ok": True}
 
 
+@app.get("/promo/{n}", response_class=HTMLResponse)
+def promo(n: int):
+    p = Path(__file__).parent / "static" / f"promo{n}.html"
+    if not p.exists():
+        return HTMLResponse("not found", status_code=404)
+    return p.read_text(encoding="utf-8")
+
+
 @app.post("/reading", response_class=HTMLResponse)
 def reading(date: str = Form(...), time: str = Form(...), city: str = Form(...),
             gender: str = Form("F"), persona: str = Form("warm"), name: str = Form(""),
