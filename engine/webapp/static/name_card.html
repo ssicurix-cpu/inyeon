@@ -31,7 +31,16 @@ button:disabled{opacity:.6}
 </style></head>
 <body><div class="wrap">
 <div class="topbar"><a href="/" class="brandlink">☾ Inyeon</a><a href="/name" class="closex">×</a></div>
-<div class="panel" id="panel">
+<div class="panel" id="gate">
+  <h1>Unlock your <em>name card</em></h1>
+  <div class="sub">Enter the license key from your purchase to create &amp; download your keepsake card.</div>
+  <label>License key</label>
+  <input id="lic" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" autocomplete="off">
+  <button id="gbtn" type="button">Unlock my card</button>
+  <div class="err" id="gerr"></div>
+  <div class="foot" style="margin-top:16px">Don't have a key yet? <a href="https://975194505819.gumroad.com/l/xivgqo" target="_blank" rel="noopener" style="color:#e8c86c;text-decoration:none;font-weight:600">Get your card — $9.99 →</a></div>
+</div>
+<div class="panel" id="panel" style="display:none">
   <h1>Your <em>Korean name card</em></h1>
   <div class="sub">Enter your details — we'll craft your keepsake card to download.</div>
   <label>Your first name</label><input id="name" placeholder="Emma">
@@ -53,6 +62,22 @@ button:disabled{opacity:.6}
 </div>
 <script>
 const $=id=>document.getElementById(id);
+// --- purchase gate: require a valid Gumroad license key ---
+(function(){
+  var params=new URLSearchParams(location.search);
+  var preset=params.get('key')||params.get('license');
+  function unlock(){$('gate').style.display='none';$('panel').style.display='block';}
+  async function verify(k){k=(k||'').trim();if(!k)return false;
+    try{var r=await fetch('/api/verify-license?key='+encodeURIComponent(k));var j=await r.json();return !!j.ok;}catch(e){return false;}}
+  $('gbtn').onclick=async function(){
+    var k=$('lic').value.trim();$('gerr').style.display='none';
+    if(!k){$('gerr').textContent='Please enter your license key.';$('gerr').style.display='block';return;}
+    $('gbtn').disabled=true;$('gbtn').textContent='Checking…';
+    if(await verify(k)){gtag&&gtag('event','card_unlock_success');unlock();}
+    else{$('gerr').textContent='That key is not valid. Check your Gumroad purchase receipt.';$('gerr').style.display='block';$('gbtn').disabled=false;$('gbtn').textContent='Unlock my card';}
+  };
+  if(preset){$('lic').value=preset;verify(preset).then(function(ok){if(ok)unlock();});}
+})();
 function attachAC(inId,acId,tzId,lngId){var inp=$(inId),ac=$(acId),t;
   inp.addEventListener('input',function(){$(tzId).value='';$(lngId).value='';clearTimeout(t);var q=inp.value.trim();if(q.length<2){ac.style.display='none';return;}
     t=setTimeout(function(){fetch('/api/cities?q='+encodeURIComponent(q)).then(r=>r.json()).then(function(list){ac.innerHTML='';

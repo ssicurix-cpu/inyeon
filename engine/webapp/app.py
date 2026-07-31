@@ -190,6 +190,37 @@ def api_name(name: str = "", date: str = "", gender: str = "F",
     return premium_korean_name(c, gender, (name or "").strip() or "friend").get("card") or {}
 
 
+GUMROAD_PERMALINK = "xivgqo"  # paid keepsake card product
+
+
+@app.get("/api/verify-license")
+def verify_license(key: str = ""):
+    """Gate the paid keepsake card: verify a Gumroad license key for this product."""
+    import urllib.request
+    import urllib.parse
+    key = (key or "").strip()
+    if not key:
+        return {"ok": False}
+    payload = urllib.parse.urlencode({
+        "product_permalink": GUMROAD_PERMALINK,
+        "license_key": key,
+        "increment_uses_count": "false",
+    }).encode()
+    try:
+        req = urllib.request.Request(
+            "https://api.gumroad.com/v2/licenses/verify", data=payload,
+            headers={"Content-Type": "application/x-www-form-urlencoded"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            j = json.loads(r.read().decode())
+    except Exception:
+        return {"ok": False}
+    if not j.get("success"):
+        return {"ok": False}
+    pur = j.get("purchase", {}) or {}
+    bad = pur.get("refunded") or pur.get("chargebacked") or pur.get("disputed")
+    return {"ok": not bad}
+
+
 _NAME_PAGE = (Path(__file__).parent / "static" / "name.html").read_text(encoding="utf-8")
 _CARD_PAGE = (Path(__file__).parent / "static" / "name_card.html").read_text(encoding="utf-8")
 
