@@ -105,7 +105,7 @@ def render_result(data: dict) -> str:
 
     pkey = (data.get("inputs") or {}).get("persona", "warm")
     html = [_PAGE_HEAD, '<div class="card">']
-    html.append(f'<div class="reader"><img src="/char/{pkey}" alt=""><span>Read by {persona.label_en}</span></div>')
+    html.append(f'<div class="reader"><img src="/char/{pkey}?v=2" alt=""><span>Read by {persona.label_en}</span></div>')
     html.append(f'<div class="eyebrow">{title} · your day master</div>')
     html.append(f'<h1>{dm.polarity.en} {dm.element.en}<br><span style="font-size:22px;color:var(--muted)">{nature}</span></h1>')
     html.append(f'<div class="hint">Your <b>Day Master</b> is the core "you" in Korean saju — '

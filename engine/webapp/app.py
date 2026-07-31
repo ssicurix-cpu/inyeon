@@ -62,7 +62,7 @@ _PERSONAS = [("warm", "The Warm Guide", "Warm &amp; comforting"),
 def _form_page() -> str:
     prad = "".join(
         f'<label class="rcard{" sel" if k=="warm" else ""}"><input type="radio" name="persona" value="{k}"{" checked" if k=="warm" else ""}>'
-        f'<img src="/char/{k}" alt="{v}" loading="lazy"><div class="rn">{v}</div><div class="rt">{t}</div></label>'
+        f'<img src="/char/{k}?v=2" alt="{v}" loading="lazy"><div class="rn">{v}</div><div class="rt">{t}</div></label>'
         for k, v, t in _PERSONAS)
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Inyeon — your reading</title>
@@ -250,9 +250,9 @@ def vid(n: str, request: Request):
 
 
 _CHARS = {
-    "warm": "hf_20260731_040932_5f9c524d-a4b2-40e0-a021-bdd7bae0e91d.png",
-    "blunt": "hf_20260731_040711_b8696b33-aced-4aee-8ad6-0f0e60072ac5.png",
-    "mystic": "hf_20260731_040715_40b8a369-3e4d-4d59-a82e-672d263bec7c.png",
+    "warm": "hf_20260731_115652_1e947388-3042-453e-929e-6435f254815d.png",
+    "blunt": "hf_20260731_115901_39057659-4ffb-4ccb-9d6f-f5d0cb0ad17c.png",
+    "mystic": "hf_20260731_115659_f13ce3f0-9c71-4891-b976-7133c56f2a08.png",
 }
 
 
