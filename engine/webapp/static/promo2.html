@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inyeon TikTok — 2 Compatibility (full process)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#05060f;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif}
+  .stage{position:relative;width:405px;height:720px;overflow:hidden;background:#05060f;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,.6)}
+  video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,15,.45),rgba(5,6,15,.12) 42%,rgba(5,6,15,.75))}
+  .cap{position:absolute;left:24px;right:24px;opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s;text-align:center}
+  .cap.show{opacity:1;transform:translateY(0)}
+  .top{top:80px}.mid{top:280px}
+  .hook{font-weight:800;font-size:28px;line-height:1.18;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.85)}
+  .hook .g{color:#e8c86c}.hook .red{color:#ff8a9b}.hook .jade{color:#8fe0bd}
+  .big{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:76px;color:#e8c86c;line-height:1;text-shadow:0 2px 22px rgba(0,0,0,.9)}
+  .sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:22px;color:#f1f0fb;margin-top:6px;text-shadow:0 2px 14px rgba(0,0,0,.85)}
+  /* couple name cards */
+  .cards{display:flex;gap:12px;justify-content:center;align-items:center}
+  .ncard{flex:1;max-width:150px;background:rgba(15,17,36,.82);border:1px solid #2a2d55;border-radius:14px;padding:14px 8px;text-align:center}
+  .ncard .who{font-size:11px;color:#a9a8cc;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .ncard .kr{font-family:'Cormorant Garamond',serif;font-size:34px;color:#e8c86c;font-weight:700;line-height:1}
+  .ncard .lab{font-size:11px;color:#a9a8cc;margin-top:6px;line-height:1.35}
+  .ncard .lab b{color:#8fe0bd}
+  .heart{color:#ff8a9b;font-size:22px}
+  /* ladder */
+  .ladder{max-width:320px;margin:0 auto;border:1px solid #2a2d55;border-radius:12px;overflow:hidden;background:rgba(15,17,36,.82)}
+  .lrow{display:flex;justify-content:space-between;padding:11px 16px;font-size:14px;color:#cfceea;border-top:1px solid #2a2d55;opacity:0;transform:translateY(6px);transition:opacity .45s,transform .45s}
+  .lrow:first-child{border-top:none}
+  .lrow b{color:#fff;font-size:16px}
+  .lrow.hot{background:rgba(232,200,108,.14)} .lrow.hot b{color:#e8c86c}
+  .cap.show .lrow{opacity:1;transform:translateY(0)}
+  .cap.show .lrow:nth-child(1){transition-delay:.1s}
+  .cap.show .lrow:nth-child(2){transition-delay:.9s}
+  .cap.show .lrow:nth-child(3){transition-delay:1.8s}
+  .cta{position:absolute;left:0;right:0;bottom:96px;text-align:center;opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+  .cta.show{opacity:1;transform:translateY(0)}
+  .cta .pill{display:inline-block;background:#e8c86c;color:#231b03;font-weight:800;font-size:18px;padding:12px 22px;border-radius:40px}
+  .wm{position:absolute;left:0;right:0;bottom:40px;text-align:center;color:#e8dcc0;font-size:14px;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .wm b{color:#e8c86c}
+  .brand{position:absolute;top:34px;left:0;right:0;text-align:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.06em;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .replay{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#161936;color:#e8c86c;border:1px solid #2a2d55;border-radius:30px;padding:8px 18px;font-size:13px;cursor:pointer}
+</style></head>
+<body>
+  <div class="stage" id="stage">
+    <video id="v" src="/vid/2" autoplay muted loop playsinline></video>
+    <div class="veil"></div>
+    <div class="brand">☾ Inyeon</div>
+
+    <!-- 1. hook -->
+    <div class="cap top" id="c1"><div class="hook">POV: you enter your birthday <span class="g">+ your person's</span> 🌙</div></div>
+    <!-- 2. score appears -->
+    <div class="cap mid" id="c2"><div class="big">79%</div><div class="sub">your saju compatibility</div></div>
+    <!-- 3. app gives names -->
+    <div class="cap top" id="c3"><div class="hook">So the app made you <span class="red">each</span> a Korean name…</div></div>
+    <!-- 4. couple name cards (the process) -->
+    <div class="cap mid" id="c4">
+      <div class="cards">
+        <div class="ncard"><div class="who">You</div><div class="kr">민서</div><div class="lab">carries <b>Water</b><br>— their missing element</div></div>
+        <div class="heart">❤</div>
+        <div class="ncard"><div class="who">Them</div><div class="kr">건우</div><div class="lab">carries <b>Wood</b><br>— your missing element</div></div>
+      </div>
+      <div class="sub" style="margin-top:12px">you become each other's missing piece</div>
+    </div>
+    <!-- 5. ladder climbs -->
+    <div class="cap mid" id="c5" style="top:300px">
+      <div class="ladder">
+        <div class="lrow"><span>Right now</span><b>79%</b></div>
+        <div class="lrow"><span>+ your couple name</span><b>84%</b></div>
+        <div class="lrow hot"><span>+ their name too</span><b>90%</b></div>
+      </div>
+    </div>
+    <!-- 6. payoff -->
+    <div class="cap mid" id="c6"><div class="big">90%</div><div class="sub">Soulmate Inyeon 🧵❤️</div></div>
+    <!-- 7. challenge -->
+    <div class="cap top" id="c7"><div class="hook">Your turn 👇 do it with your person,<br><span class="g">post your %</span> & tag <span class="g">@inyeon.saju</span></div></div>
+    <div class="cta" id="cta"><span class="pill">inyeon.onrender.com · free 🧵</span></div>
+    <div class="wm">what's your inyeon? · <b>inyeon.onrender.com</b></div>
+  </div>
+  <button class="replay" onclick="run()">▶ Replay</button>
+<script>
+  const steps=[
+    {el:'c1',on:200,off:2600},
+    {el:'c2',on:2800,off:5200},
+    {el:'c3',on:5400,off:7600},
+    {el:'c4',on:7800,off:11200},
+    {el:'c5',on:11400,off:15000},
+    {el:'c6',on:15200,off:17600},
+    {el:'c7',on:17800,off:20800},
+    {el:'cta',on:18400,off:20800},
+  ];
+  let T=[];
+  const ids=['c1','c2','c3','c4','c5','c6','c7','cta'];
+  function clearAll(){T.forEach(t=>clearTimeout(t));T=[];ids.forEach(id=>document.getElementById(id).classList.remove('show'));}
+  function run(){clearAll();steps.forEach(s=>{const e=document.getElementById(s.el);T.push(setTimeout(()=>e.classList.add('show'),s.on));T.push(setTimeout(()=>e.classList.remove('show'),s.off));});T.push(setTimeout(run,21100));}
+  document.getElementById('v').addEventListener('loadeddata',run);run();
+</script>
+</body></html>

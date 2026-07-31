@@ -1,9 +1,12 @@
 """
-검증된 이름 풀 (시드) + 성(姓) 표.
+검증된 이름 풀 (시드) + 성(姓) 표 + 인명용 한자 DB(한자·뜻·자원오행).
 
-핵심 자산: 실제 현대 인기 given name들. 발음오행은 코드로 계산(정확),
-한자·뜻은 '예시(감수 전)' — 실서비스는 대법원 인기 이름 통계 + 전문가 감수로 확장.
-이름은 '생성'이 아니라 이 풀에서 '선별'한다(촌스러움 방지).
+핵심 자산: 실제 현대 인기 given name들. 이름은 '생성'이 아니라 이 풀에서 '선별'(촌스러움 방지).
+- 발음오행: 코드로 계산(정확).
+- 한자·뜻: 인기 이름의 통용 한자·뜻 (공개 데이터 기반, v1).
+- 자원오행: **부수(radical) 기반 통용 기준으로 모든 글자에 배정.** 자원오행은 단일 정답이 없는 유파 영역이라
+  '공인된 하나'가 없음 → 널리 쓰이는 부수→오행 표를 **일관되게** 적용(정답이 아니라 일관성이 핵심).
+  유료 상품이라 미배정(None) 없이 전부 채운다. ('certified' 과장 금지 = "traditional 오행 방식".)
 """
 from __future__ import annotations
 
@@ -12,51 +15,152 @@ from dataclasses import dataclass, field
 from ..core import Element
 from .phonetics import name_sound_elements, sound_element
 
+W, F_, T, G, S = Element.WOOD, Element.FIRE, Element.EARTH, Element.METAL, Element.WATER
+
+# 인명용 한자 DB: char → (뜻(영문 짧게), 자원오행). 자원오행은 부수(radical) 기반 통용 기준으로 전부 배정.
+# 부수→오행 통용 기준(요약): 氵水雨夕月→水 · 火日心彳辶亻→火 · 木禾竹广目→木 · 金玉貝攵→金 · 土山石田女力宀→土
+HANJA: dict[str, tuple[str, Element]] = {
+    # 水 (water)  氵·水·夕·月(肉)
+    "潤": ("flourishing, moist", S), "河": ("river", S), "泰": ("great, calm", S),
+    "洙": ("riverbank", S), "沿": ("along a stream", S), "浩": ("vast", S), "海": ("sea", S),
+    "潾": ("clear water", S), "有": ("to have", S), "多": ("abundant", S),
+    # 火 (fire / sun / heart / person / motion)  火·日·心·亻·彳·辶
+    "智": ("wisdom", F_), "昊": ("vast sky", F_), "昭": ("bright", F_), "旿": ("bright noon", F_),
+    "恩": ("grace", F_), "晛": ("sunlight", F_), "炫": ("shining", F_), "旻": ("autumn sky", F_),
+    "道": ("path", F_), "俊": ("talented", F_), "健": ("strong", F_), "佳": ("fine, beautiful", F_),
+    "書": ("book, writing", F_), "律": ("rhythm, law", F_),
+    # 木 (wood / grain / eaves)  木·禾·竹·广·目
+    "秀": ("excellent, elegant", W), "松": ("pine", W), "桓": ("strong tree", W),
+    "彬": ("refined", W), "榮": ("glory, flourish", W), "柔": ("gentle", W),
+    "康": ("peaceful, healthy", W), "睿": ("wise, insightful", W),
+    # 金 (metal / jade / shell / strike)  金·玉·貝·攵
+    "瑞": ("auspicious", G), "珍": ("treasure", G), "錫": ("bestow", G),
+    "玟": ("gem", G), "瑀": ("jade", G), "珉": ("jade-like stone", G), "敏": ("quick, clever", G),
+    # 土 (earth / mountain / woman / strength / roof)  土·山·女·力·宀
+    "宇": ("house, cosmos", T), "圭": ("jade tablet", T), "城": ("fortress", T),
+    "娟": ("beautiful", T), "娥": ("graceful", T), "垠": ("boundary, land", T),
+    "娜": ("graceful", T), "勳": ("merit", T),
+}
+# 확장 한자 (부수 기반 자원오행 일관 적용)
+HANJA.update({
+    # 水 氵·水·雨·玄
+    "準": ("standard, poised", S), "源": ("source, origin", S), "雨": ("rain", S), "玄": ("profound", S),
+    # 火 亻·心·日
+    "佑": ("help, protect", F_), "志": ("will, aspiration", F_), "時": ("time, season", F_),
+    "昇": ("rising", F_), "旼": ("harmonious", F_), "昀": ("sunlight", F_),
+    # 木 艹·木
+    "芝": ("auspicious plant", W), "朱": ("vermilion", W), "桃": ("peach blossom", W), "荷": ("lotus", W),
+    # 金 貝·金·玉·言
+    "賢": ("wise, virtuous", G), "銀": ("silver", G), "珠": ("pearl", G),
+    "詩": ("poetry", G), "誠": ("sincerity", G),
+    # 土 山·女·宀
+    "峻": ("lofty, noble", T), "媛": ("beauty, grace", T), "宙": ("cosmos, eternity", T),
+})
+
 
 @dataclass
 class NameEntry:
     hangul: str
-    gender: str                 # "M" / "F" / "U"(유니섹스)
-    hanja: str | None = None    # 예시(감수 전)
-    meaning: str | None = None  # 예시(감수 전)
+    gender: str                 # "M" / "F" / "U"
+    hanja: str | None = None
+    meaning: str | None = None
     sound_elements: list[Element] = field(default_factory=list)
+    resource_elements: list = field(default_factory=list)  # 자원오행(글자별), None 가능
 
     def __post_init__(self):
         if not self.sound_elements:
             self.sound_elements = name_sound_elements(self.hangul)
+        if self.hanja and not self.resource_elements:
+            self.resource_elements = [HANJA.get(ch, (None, None))[1] for ch in self.hanja]
+        # 뜻 자동 조합 (없을 때, DB에 있으면)
+        if self.hanja and not self.meaning:
+            parts = [HANJA[ch][0] for ch in self.hanja if ch in HANJA]
+            if len(parts) == len(self.hanja):
+                self.meaning = " · ".join(parts)
 
     def supplies(self, element: Element) -> bool:
+        """발음오행으로 해당 원소를 공급하는가 (매칭 하드필터)."""
         return element in self.sound_elements
+
+    def resource_supplies(self, element: Element) -> bool:
+        """자원오행으로 해당 원소를 공급하는가 (부가 신호)."""
+        return element in [e for e in self.resource_elements if e]
 
     @property
     def first_element(self) -> Element:
         return self.sound_elements[0]
 
+    @property
+    def hanja_breakdown(self) -> list[dict]:
+        """글자별 한자·뜻·자원오행 (이름 카드용)."""
+        out = []
+        for ch in (self.hanja or ""):
+            m, el = HANJA.get(ch, (None, None))
+            out.append({"char": ch, "meaning": m, "element": el})
+        return out
 
-# 현대 인기 이름 시드 풀 (한자·뜻은 일부만 예시로 첨부)
+
+# 현대 인기 이름 시드 풀 (한자·뜻·자원오행 v1)
 SEED_NAMES: list[NameEntry] = [
     # 남 (M)
-    NameEntry("도윤", "M", "道潤", "길 도 · 윤택할 윤 (path · flourishing)"),
-    NameEntry("하준", "M"),
-    NameEntry("서준", "M"),
-    NameEntry("민준", "M", "敏俊", "민첩할 민 · 준수할 준 (quick · talented)"),
-    NameEntry("건우", "M", "健宇", "굳셀 건 · 집 우 (strong · great)"),
-    NameEntry("태오", "M"),
-    NameEntry("지호", "M"),
-    NameEntry("강민", "M"),
-    NameEntry("준서", "M"),
-    NameEntry("은우", "M"),
+    NameEntry("도윤", "M", "道潤"),
+    NameEntry("하준", "M", "河俊"),
+    NameEntry("서준", "M", "瑞俊"),
+    NameEntry("민준", "M", "敏俊"),
+    NameEntry("건우", "M", "健宇"),
+    NameEntry("태오", "M", "泰旿"),
+    NameEntry("지호", "M", "智昊"),
+    NameEntry("강민", "M", "康敏"),
+    NameEntry("준서", "M", "俊書"),
+    NameEntry("은우", "M", "恩宇"),
+    NameEntry("지훈", "M", "智勳"),
+    NameEntry("현우", "M", "炫宇"),
     # 여 (F)
-    NameEntry("서연", "F", "瑞娟", "상서로울 서 · 아름다울 연 (auspicious · beautiful)"),
-    NameEntry("지우", "F", "智宇", "지혜 지 · 집 우 (wisdom · universe)"),
-    NameEntry("하은", "F"),
-    NameEntry("다은", "F"),
-    NameEntry("가은", "F"),
-    NameEntry("민서", "F"),
-    NameEntry("유진", "F"),
-    NameEntry("수아", "F"),
-    NameEntry("나윤", "F"),
-    NameEntry("보라", "F"),
+    NameEntry("서연", "F", "瑞娟"),
+    NameEntry("지우", "F", "智宇"),
+    NameEntry("하은", "F", "河恩"),
+    NameEntry("다은", "F", "多恩"),
+    NameEntry("가은", "F", "佳恩"),
+    NameEntry("민서", "F", "敏瑞"),
+    NameEntry("유진", "F", "有珍"),
+    NameEntry("수아", "F", "秀娥"),
+    NameEntry("나윤", "F", "娜潤"),
+    NameEntry("예린", "F", "睿潾"),
+    NameEntry("소율", "F", "昭律"),
+    NameEntry("지아", "F", "智娥"),
+    # 확장 (검증된 한자 재조합)
+    NameEntry("우진", "M", "宇珍"),
+    NameEntry("준우", "M", "俊宇"),
+    NameEntry("도현", "M", "道炫"),
+    NameEntry("태준", "M", "泰俊"),
+    NameEntry("은호", "M", "恩昊"),
+    NameEntry("지건", "M", "智健"),
+    NameEntry("서은", "F", "瑞恩"),
+    NameEntry("지은", "F", "智恩"),
+    NameEntry("예은", "F", "睿恩"),
+    NameEntry("유나", "F", "有娜"),
+    NameEntry("서아", "F", "瑞娥"),
+    NameEntry("지수", "F", "智洙"),
+    NameEntry("소은", "F", "昭恩"),
+    NameEntry("나은", "F", "娜恩"),
+    NameEntry("하윤", "F", "河潤"),
+    NameEntry("서윤", "F", "瑞潤"),
+    NameEntry("지윤", "F", "智潤"),
+    # 확장 2 (새 한자 포함)
+    NameEntry("예준", "M", "睿俊"),
+    NameEntry("태현", "M", "泰炫"),
+    NameEntry("현준", "M", "賢俊"),
+    NameEntry("시우", "M", "時宇"),
+    NameEntry("승우", "M", "昇宇"),
+    NameEntry("주원", "M", "宙源"),
+    NameEntry("지유", "F", "智柔"),
+    NameEntry("예원", "F", "睿媛"),
+    NameEntry("시아", "F", "詩娥"),
+    NameEntry("은서", "F", "恩瑞"),
+    NameEntry("윤아", "F", "潤娥"),
+    NameEntry("서현", "F", "瑞炫"),
+    NameEntry("예진", "F", "睿珍"),
+    NameEntry("수연", "F", "洙娟"),
 ]
 
 # 성(姓) 표: 발음오행은 코드로 계산. 인기순 근사 정렬.

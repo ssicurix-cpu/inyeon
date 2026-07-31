@@ -158,9 +158,9 @@ def _compat_challenge(f: dict) -> str | None:
 def _name_teaser(name_rec: dict | None) -> str | None:
     if not name_rec or not name_rec.get("best"):
         return None
-    el = name_rec["harmonizing_element"].en
-    return (f"a Korean name carrying {el} could tune your harmony "
-            f"from {name_rec['base_score']}% to {name_rec['boosted_score']}%")
+    top = name_rec.get("both_boosted", name_rec.get("boosted_score"))
+    return (f"a pair of Korean names — each carrying what the other lacks — "
+            f"could tune your harmony from {name_rec['base_score']}% to {top}%")
 
 
 def render_compat(a: Chart, b: Chart, persona: Persona = Persona.WARM,

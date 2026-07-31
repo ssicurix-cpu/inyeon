@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Korean Name — built from your missing element | Inyeon</title>
+<meta name="description" content="Get a real Korean name crafted from your saju's missing element — hanja, meaning and element, inspired by your own name. Free.">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6QNQRMT8FH"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6QNQRMT8FH');</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{background:#0a0b1a;color:#f1f0fb;font-family:'Inter',sans-serif;padding:26px 16px;margin:0}
+.card{max-width:460px;margin:0 auto;background:#161936;border:1px solid #2a2d55;border-radius:22px;padding:26px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.brandlink{font-family:'Cormorant Garamond',serif;font-size:20px;color:#f1f0fb;text-decoration:none;letter-spacing:.04em}
+.closex{color:#a9a8cc;text-decoration:none;font-size:26px;line-height:1;padding:0 8px}
+h1{font-family:'Cormorant Garamond',serif;font-size:29px;font-weight:600;margin:0 0 4px;line-height:1.15}
+h1 em{color:#e8c86c;font-style:normal}
+.sub{color:#a9a8cc;font-size:14px;margin-bottom:18px}
+label{display:block;font-size:13px;color:#a9a8cc;margin:13px 0 6px}
+input,select{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d55;border-radius:10px;color:#f1f0fb;font-size:14px;box-sizing:border-box}
+.row{display:flex;gap:10px}.row>div{flex:1}
+button{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:20px;font-size:15px;cursor:pointer}
+button:disabled{opacity:.6}
+.acwrap{position:relative}
+.ac{position:absolute;left:0;right:0;top:100%;z-index:30;background:#0f1124;border:1px solid #2a2d55;border-top:none;border-radius:0 0 10px 10px;max-height:210px;overflow:auto;display:none}
+.ac div{padding:10px 12px;font-size:14px;cursor:pointer;border-top:1px solid #1c1f3d}
+.ac div:hover{background:#1a1d3d}
+.result{display:none;margin-top:22px;border-top:1px solid #2a2d55;padding-top:20px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#e8c86c;margin-bottom:8px}
+.kr{font-family:'Nanum Myeongjo',serif;font-size:52px;color:#e8c86c;font-weight:800;text-align:center;line-height:1}
+.hj{font-size:24px;color:#a9a8cc;text-align:center;margin-top:4px}
+.rows{margin:16px 0 12px}
+.rw{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #2a2d55;font-size:13px}
+.rw:first-child{border-top:none}
+.rw .c{font-family:'Nanum Myeongjo',serif;font-size:30px;width:38px;text-align:center}
+.rw .m{flex:1;color:#a9a8cc}
+.rw .e{color:#8fe0bd;font-weight:600;font-size:12px;white-space:nowrap}
+.reason{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:#e9e8fb;line-height:1.5;margin:8px 0}
+.lock{margin-top:16px;border:1px dashed #2a2d55;border-radius:12px;padding:16px;text-align:center;background:rgba(232,200,108,.05)}
+.lock .t{font-size:14px;color:#f1f0fb;font-weight:600}
+.lock .d{font-size:12px;color:#6f6e93;margin:4px 0 12px}
+.cta{display:inline-block;background:#e8c86c;color:#231b03;font-weight:600;padding:12px 22px;border-radius:40px;text-decoration:none;font-size:14px}
+.err{color:#ff8a9b;font-size:13px;margin-top:10px;text-align:center;display:none}
+.foot{max-width:460px;margin:14px auto 0;text-align:center;color:#6f6e93;font-size:11px}
+</style></head>
+<body>
+<div class="card">
+  <div class="topbar"><a href="/" class="brandlink">☾ Inyeon</a><a href="/" class="closex">×</a></div>
+  <h1>Your <em>Korean name</em>, from your missing element</h1>
+  <div class="sub">A real Korean name — hanja, meaning &amp; element — inspired by your own name. Free.</div>
+  <div id="form">
+    <label>Your first name</label><input id="name" placeholder="Emma" required>
+    <div class="row">
+      <div><label>Birth date</label><input id="date" type="date" required></div>
+      <div><label>Time (optional)</label><input id="time" type="time"></div>
+    </div>
+    <label>Birth city</label>
+    <div class="acwrap"><input id="city" value="Seoul, South Korea" placeholder="Type your city…" autocomplete="off"><div id="cityAC" class="ac"></div></div>
+    <input type="hidden" id="tz" value="Asia/Seoul"><input type="hidden" id="lng" value="126.978">
+    <label>Gender (for the name)</label>
+    <select id="gender"><option value="F">Female</option><option value="M">Male</option></select>
+    <button id="btn" type="button">Reveal my Korean name</button>
+    <div class="err" id="err"></div>
+  </div>
+  <div class="result" id="result">
+    <div class="eyebrow">Your Korean name</div>
+    <div class="kr" id="kr">—</div>
+    <div class="hj" id="hjc"></div>
+    <div class="rows" id="rows"></div>
+    <div class="reason" id="reason"></div>
+    <div class="lock">
+      <div class="t">🔒 Your keepsake name card — $9.99</div>
+      <div class="d">A high-res, printable card with your hangul name, hanja, meaning &amp; 오행 — yours to download, share &amp; frame.</div>
+      <a class="cta" id="unlock" href="https://975194505819.gumroad.com/l/xivgqo" target="_blank" rel="noopener">Get my keepsake card →</a>
+    </div>
+  </div>
+</div>
+<p class="foot">For entertainment &amp; self-discovery · Inyeon — Korean naming rooted in saju · inyeon.onrender.com</p>
+<script>
+const btn=document.getElementById('btn'),err=document.getElementById('err');
+function attachAC(inId,acId,tzId,lngId){
+  var inp=document.getElementById(inId), ac=document.getElementById(acId), t;
+  inp.addEventListener('input',function(){
+    document.getElementById(tzId).value=''; document.getElementById(lngId).value='';
+    clearTimeout(t); var q=inp.value.trim(); if(q.length<2){ac.style.display='none';return;}
+    t=setTimeout(function(){
+      fetch('/api/cities?q='+encodeURIComponent(q)).then(r=>r.json()).then(function(list){
+        ac.innerHTML=''; list.forEach(function(c){var d=document.createElement('div');d.textContent=c.label;
+          d.onclick=function(){inp.value=c.label;document.getElementById(tzId).value=c.tz;document.getElementById(lngId).value=c.lng;ac.style.display='none';};ac.appendChild(d);});
+        ac.style.display=list.length?'block':'none';});
+    },200);
+  });
+  document.addEventListener('click',function(e){if(!ac.contains(e.target)&&e.target!==inp)ac.style.display='none';});
+}
+attachAC('city','cityAC','tz','lng');
+document.getElementById('unlock').onclick=function(){gtag && gtag('event','name_upsell_click');};
+btn.onclick=async()=>{
+  const name=document.getElementById('name').value.trim();
+  const date=document.getElementById('date').value;
+  const time=document.getElementById('time').value||"12:00";
+  const city=document.getElementById('city').value, tz=document.getElementById('tz').value, lng=document.getElementById('lng').value;
+  const gender=document.getElementById('gender').value;
+  err.style.display='none';
+  if(!name){err.textContent='Please enter your first name.';err.style.display='block';return;}
+  if(!date){err.textContent='Please enter your birth date.';err.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Crafting your name…';
+  try{
+    const q=`name=${encodeURIComponent(name)}&date=${date}&time=${time}&city=${encodeURIComponent(city)}&tz=${encodeURIComponent(tz)}&lng=${lng}&gender=${gender}`;
+    const r=await fetch('/api/name?'+q); const c=await r.json();
+    if(!c||!c.hangul){err.textContent='Could not craft a name — try a different time/city.';err.style.display='block';btn.disabled=false;btn.textContent='Reveal my Korean name';return;}
+    document.getElementById('kr').textContent=c.hangul;
+    document.getElementById('hjc').textContent=c.hanja||'';
+    document.getElementById('rows').innerHTML=(c.breakdown||[]).map(b=>
+      `<div class="rw"><span class="c">${b.char}</span><span class="m">${b.meaning||''}</span><span class="e">${b.element?('자원오행 '+b.element):''}</span></div>`).join('');
+    document.getElementById('reason').textContent=c.reasoning_en||'';
+    document.getElementById('form').style.display='none';
+    document.getElementById('result').style.display='block';
+    gtag && gtag('event','name_generated');
+  }catch(e){err.textContent='Something went wrong. Please try again.';err.style.display='block';btn.disabled=false;btn.textContent='Reveal my Korean name';}
+};
+</script>
+</body></html>

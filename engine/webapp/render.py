@@ -18,6 +18,8 @@ _POLARITY_DESC = {"Yang": "bold, outward and active", "Yin": "soft, inward and r
 
 _PAGE_HEAD = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your Inyeon reading</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6QNQRMT8FH"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6QNQRMT8FH');</script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0a0b1a;--panel:#161936;--panel2:#1d2044;--line:#2a2d55;--gold:#e8c86c;--jade:#8fe0bd;--text:#f1f0fb;--muted:#a9a8cc;--dim:#7a7aa0}
@@ -42,6 +44,20 @@ h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-he
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .chip{font-size:12px;border:1px solid var(--line);border-radius:30px;padding:5px 13px;color:var(--muted)}
 .badge{display:inline-block;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:30px;padding:4px 12px;margin-bottom:14px}
+.reader{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.reader img{width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid var(--gold)}
+.reader span{font-size:13px;color:var(--gold);letter-spacing:.02em}
+.namenudge{background:rgba(232,200,108,.08);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.namenudge a{color:var(--gold);text-decoration:none;font-weight:600;white-space:nowrap}
+.pname{margin-top:24px;border:1px solid var(--gold);border-radius:16px;padding:20px;background:linear-gradient(180deg,rgba(232,200,108,.07),rgba(232,200,108,.02))}
+.pn-hangul{font-family:'Cormorant Garamond',serif;font-size:46px;color:var(--gold);font-weight:600;line-height:1;text-align:center}
+.pn-hanja{font-size:22px;color:var(--muted);text-align:center;margin-top:2px}
+.pn-rows{margin:16px 0 12px}
+.pn-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.pn-row:first-child{border-top:none}
+.pn-row .c{font-size:28px;color:var(--text);width:34px;text-align:center}
+.pn-row .m{flex:1;color:var(--muted)}
+.pn-row .e{color:var(--jade);font-weight:600;white-space:nowrap;font-size:12px}
 .hint{font-size:12px;color:var(--dim);line-height:1.55;margin-top:8px}
 .hint b{color:var(--muted);font-weight:500}
 .compat{margin-top:26px;border-top:1px solid var(--line);padding-top:22px}
@@ -53,6 +69,16 @@ h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-he
 .lrow.hot{background:rgba(232,200,108,.1)}
 .lrow.hot b{color:var(--gold)}
 .sendcta{display:block;text-align:center;border:1px solid var(--gold);color:var(--gold);font-weight:600;padding:13px;border-radius:40px;margin-top:12px;text-decoration:none;font-size:14px}
+.couple{margin-top:22px;border:1px solid var(--line);border-radius:16px;padding:18px;background:linear-gradient(180deg,rgba(232,200,108,.06),rgba(200,80,90,.05))}
+.couple .eyebrow{margin-bottom:4px}
+.cnames{display:flex;gap:12px;margin:14px 0}
+.cname{flex:1;text-align:center;border:1px solid var(--line);border-radius:12px;padding:14px 8px;background:#0f1124}
+.cname .kr{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);font-weight:600;line-height:1.1}
+.cname .hj{font-size:14px;color:var(--muted);margin-top:2px}
+.cname .hjm{font-size:10px;color:var(--dim);font-style:italic;margin-top:1px;line-height:1.3}
+.cname .who{font-size:11px;color:var(--dim);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.cname .mean{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.4}
+.cthread{text-align:center;color:var(--gold);font-size:18px;margin:2px 0}
 .cta{display:block;text-align:center;background:var(--gold);color:#231b03;font-weight:600;padding:14px;border-radius:40px;margin-top:22px;text-decoration:none}
 .sec{margin-top:24px}
 .askbox{display:flex;gap:8px;margin-top:8px}
@@ -89,8 +115,13 @@ def render_result(data: dict) -> str:
     who = data.get("name")
     title = f"{who}'s reading" if who else "Your reading"
 
+    pkey = (data.get("inputs") or {}).get("persona", "warm")
     html = [_PAGE_HEAD, '<div class="card">']
-    html.append(f'<div class="badge">{persona.label_en}</div>')
+    html.append(f'<div class="reader"><img src="/char/{pkey}?v=2" alt=""><span>Read by {persona.label_en}</span></div>')
+    if not who:
+        html.append('<div class="namenudge">✍️ You didn\'t enter your name — add it and we\'ll craft your '
+                    '<b>personalized Korean name</b> from your missing element. '
+                    '<a href="/start">Add my name →</a></div>')
     html.append(f'<div class="eyebrow">{title} · your day master</div>')
     html.append(f'<h1>{dm.polarity.en} {dm.element.en}<br><span style="font-size:22px;color:var(--muted)">{nature}</span></h1>')
     html.append(f'<div class="hint">Your <b>Day Master</b> is the core "you" in Korean saju — '
@@ -136,15 +167,40 @@ def render_result(data: dict) -> str:
         rec = data.get("name_rec")
         pname = data.get("partner_name") or "them"
         if rec and rec.get("best"):
-            html.append(f'<div class="missing">Your Korean name <b>{rec["best"].hangul}</b> '
-                        f'(adds {rec["harmonizing_element"].en}) tunes the harmony between you.</div>')
             html.append('<div class="ladder">'
                         f'<div class="lrow"><span>Right now</span><b>{rec["base_score"]}%</b></div>'
-                        f'<div class="lrow"><span>+ your Korean name</span><b>{rec["boosted_score"]}%</b></div>'
-                        f'<div class="lrow hot"><span>+ {pname}\'s Korean name too</span>'
+                        f'<div class="lrow"><span>+ your couple name</span><b>{rec["boosted_score"]}%</b></div>'
+                        f'<div class="lrow hot"><span>+ {pname}\'s couple name too</span>'
                         f'<b>{rec["both_boosted"]}% · {rec["both_tier"]}</b></div></div>')
-            html.append(f'<a class="sendcta" href="#">Send this to {pname} → reach '
+            html.append(f'<a class="sendcta" href="javascript:void(0)" onclick="shareInyeon()">Send this to {pname} → reach '
                         f'{rec["both_boosted"]}% together</a>')
+        cpl = data.get("couple_names")
+        if cpl and cpl.get("self_card") and cpl.get("partner_card"):
+            you = data.get("name") or "You"
+            them = data.get("partner_name") or "Them"
+            sc, pc = cpl["self_card"], cpl["partner_card"]
+            html.append('<div class="couple">')
+            html.append('<div class="eyebrow">Your couple name — become each other\'s missing element</div>')
+            html.append('<div class="cnames">'
+                        f'<div class="cname"><div class="who">{you}</div>'
+                        f'<div class="kr">{sc["hangul"]}</div>'
+                        + (f'<div class="hj">{sc["hanja"]}</div>' if sc.get("hanja") else '')
+                        + (f'<div class="hjm">{sc["meaning"]}</div>' if sc.get("meaning") else '')
+                        + f'<div class="mean">carries <b style="color:var(--jade)">{sc["target_element"].en}</b> — what {them} is missing</div></div>'
+                        '<div class="cthread">❤</div>'
+                        f'<div class="cname"><div class="who">{them}</div>'
+                        f'<div class="kr">{pc["hangul"]}</div>'
+                        + (f'<div class="hj">{pc["hanja"]}</div>' if pc.get("hanja") else '')
+                        + (f'<div class="hjm">{pc["meaning"]}</div>' if pc.get("meaning") else '')
+                        + f'<div class="mean">carries <b style="color:var(--jade)">{pc["target_element"].en}</b> — what {you} is missing</div></div>'
+                        '</div>')
+            html.append('<div class="reading" style="font-size:16px;margin:6px 0 0">'
+                        'You don\'t have to make it official. Use them as your private pet names — '
+                        'just the two of you. In saju, speaking your partner\'s missing element out loud, '
+                        'every day, is how two people slowly tune into one.</div>')
+            html.append(f'<div class="hint">This tunes your <b>name-harmony layer</b>, not your birth-fixed fate — '
+                        f'try it for fun. Deep couple report & authenticated naming coming soon.</div>')
+            html.append('</div>')
         html.append('</div>')
 
     inp = data.get("inputs") or {}
@@ -158,8 +214,26 @@ def render_result(data: dict) -> str:
                 'const a=document.getElementById("ans");a.style.display="block";a.textContent="…";'
                 'const f=new URLSearchParams(Object.assign({},I,{question:q}));'
                 'const res=await fetch("/ask",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});'
-                'const j=await res.json();a.textContent=j.text;};</script>')
-    html.append('<a class="cta" href="#">Get your Korean destiny name</a>')
+                'const j=await res.json();a.textContent=j.text;};'
+                'function shareInyeon(){const u="https://inyeon.onrender.com";'
+                'if(navigator.share){navigator.share({title:"Inyeon",text:"What\\u2019s your Inyeon? Korean saju & compatibility",url:u});}'
+                'else{navigator.clipboard&&navigator.clipboard.writeText(u);alert("Link copied — send it to them!");}}'
+                '</script>')
+    pn = data.get("premium_name")
+    if pn:
+        rows = "".join(
+            f'<div class="pn-row"><span class="c">{b["char"]}</span>'
+            f'<span class="m">{b.get("meaning") or ""}</span>'
+            f'<span class="e">{("자원오행 " + b["element"]) if b.get("element") else ""}</span></div>'
+            for b in pn.get("breakdown", []))
+        html.append('<div class="pname"><div class="eyebrow">Your Korean destiny name — from your missing element</div>'
+                    f'<div class="pn-hangul">{pn["hangul"]}</div>'
+                    + (f'<div class="pn-hanja">{pn["hanja"]}</div>' if pn.get("hanja") else '')
+                    + f'<div class="pn-rows">{rows}</div>'
+                    + f'<div class="reading" style="font-size:15px;margin:0">{pn["reasoning_en"]}</div>'
+                    '<div class="hint" style="margin-top:10px">This is your free preview. '
+                    'Get it as a high-res, printable keepsake card — yours to download, share &amp; frame.</div></div>')
+    html.append('<a class="cta" href="https://975194505819.gumroad.com/l/xivgqo" target="_blank" rel="noopener">Get your keepsake name card — $9.99 →</a>')
     html.append('</div>')
     html.append(_PAGE_FOOT)
     return "".join(html)
