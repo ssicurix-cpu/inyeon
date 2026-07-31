@@ -66,6 +66,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-he
 .cname{flex:1;text-align:center;border:1px solid var(--line);border-radius:12px;padding:14px 8px;background:#0f1124}
 .cname .kr{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);font-weight:600;line-height:1.1}
 .cname .hj{font-size:14px;color:var(--muted);margin-top:2px}
+.cname .hjm{font-size:10px;color:var(--dim);font-style:italic;margin-top:1px;line-height:1.3}
 .cname .who{font-size:11px;color:var(--dim);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
 .cname .mean{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.4}
 .cthread{text-align:center;color:var(--gold);font-size:18px;margin:2px 0}
@@ -175,11 +176,13 @@ def render_result(data: dict) -> str:
                         f'<div class="cname"><div class="who">{you}</div>'
                         f'<div class="kr">{sc["hangul"]}</div>'
                         + (f'<div class="hj">{sc["hanja"]}</div>' if sc.get("hanja") else '')
+                        + (f'<div class="hjm">{sc["meaning"]}</div>' if sc.get("meaning") else '')
                         + f'<div class="mean">carries <b style="color:var(--jade)">{sc["target_element"].en}</b> — what {them} is missing</div></div>'
                         '<div class="cthread">❤</div>'
                         f'<div class="cname"><div class="who">{them}</div>'
                         f'<div class="kr">{pc["hangul"]}</div>'
                         + (f'<div class="hj">{pc["hanja"]}</div>' if pc.get("hanja") else '')
+                        + (f'<div class="hjm">{pc["meaning"]}</div>' if pc.get("meaning") else '')
                         + f'<div class="mean">carries <b style="color:var(--jade)">{pc["target_element"].en}</b> — what {you} is missing</div></div>'
                         '</div>')
             html.append('<div class="reading" style="font-size:16px;margin:6px 0 0">'
