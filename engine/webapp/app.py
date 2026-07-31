@@ -28,7 +28,7 @@ _PERSONAS = [("warm", "The Warm Guide", "Warm &amp; comforting"),
 
 def _form_page() -> str:
     prad = "".join(
-        f'<label class="rcard"><input type="radio" name="persona" value="{k}"{" checked" if k=="warm" else ""}>'
+        f'<label class="rcard{" sel" if k=="warm" else ""}"><input type="radio" name="persona" value="{k}"{" checked" if k=="warm" else ""}>'
         f'<img src="/char/{k}" alt="{v}" loading="lazy"><div class="rn">{v}</div><div class="rt">{t}</div></label>'
         for k, v, t in _PERSONAS)
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
@@ -50,6 +50,7 @@ input,select{{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d5
 .rcard .rt{{font-size:9px;color:#a9a8cc;margin-top:2px}}
 .rcard input{{display:none}}
 .rcard:has(input:checked){{border-color:#e8c86c;box-shadow:0 0 0 1px #e8c86c}}
+.rcard.sel{{border-color:#e8c86c;box-shadow:0 0 0 1px #e8c86c}}
 .row{{display:flex;gap:10px}} .row>div{{flex:1}}
 button{{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:22px;font-size:15px;cursor:pointer}}
 details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}}
@@ -71,7 +72,17 @@ details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}
     <div><label>Their gender (for name)</label><select name="p_gender"><option value="M">Male</option><option value="F">Female</option></select></div></div>
   </details>
   <button type="submit">Reveal my reading</button>
-</form></body></html>"""
+</form>
+<script>
+document.querySelectorAll('.readers .rcard').forEach(function(c){{
+  c.addEventListener('click',function(){{
+    document.querySelectorAll('.readers .rcard').forEach(function(x){{x.classList.remove('sel');}});
+    c.classList.add('sel');
+    var r=c.querySelector('input');if(r)r.checked=true;
+  }});
+}});
+</script>
+</body></html>"""
 
 
 _LANDING = (Path(__file__).parent / "static" / "landing.html").read_text(encoding="utf-8")
