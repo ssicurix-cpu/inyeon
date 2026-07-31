@@ -178,6 +178,26 @@ def healthz():
     return {"ok": True}
 
 
+@app.get("/api/name")
+def api_name(name: str = "", date: str = "", gender: str = "F",
+             time: str = "12:00", city: str = "Seoul", tz: str = "", lng: str = ""):
+    """Korean naming tool: premium destiny-name card from birth + original name."""
+    from saju.naming import premium_korean_name
+    if not date:
+        return {}
+    dt = datetime.strptime(f"{date} {time or '12:00'}", "%Y-%m-%d %H:%M")
+    c = _chart_tz(dt, tz, lng, city)
+    return premium_korean_name(c, gender, (name or "").strip() or "friend").get("card") or {}
+
+
+_NAME_PAGE = (Path(__file__).parent / "static" / "name.html").read_text(encoding="utf-8")
+
+
+@app.get("/name", response_class=HTMLResponse)
+def name_page():
+    return _NAME_PAGE
+
+
 @app.get("/api/lunar")
 def api_lunar(date: str, time: str = "12:00", city: str = "Seoul",
               tz: str = "", lng: str = ""):

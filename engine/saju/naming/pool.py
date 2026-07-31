@@ -41,6 +41,21 @@ HANJA: dict[str, tuple[str, Element]] = {
     "娟": ("beautiful", T), "娥": ("graceful", T), "垠": ("boundary, land", T),
     "娜": ("graceful", T), "勳": ("merit", T),
 }
+# 확장 한자 (부수 기반 자원오행 일관 적용)
+HANJA.update({
+    # 水 氵·水·雨·玄
+    "準": ("standard, poised", S), "源": ("source, origin", S), "雨": ("rain", S), "玄": ("profound", S),
+    # 火 亻·心·日
+    "佑": ("help, protect", F_), "志": ("will, aspiration", F_), "時": ("time, season", F_),
+    "昇": ("rising", F_), "旼": ("harmonious", F_), "昀": ("sunlight", F_),
+    # 木 艹·木
+    "芝": ("auspicious plant", W), "朱": ("vermilion", W), "桃": ("peach blossom", W), "荷": ("lotus", W),
+    # 金 貝·金·玉·言
+    "賢": ("wise, virtuous", G), "銀": ("silver", G), "珠": ("pearl", G),
+    "詩": ("poetry", G), "誠": ("sincerity", G),
+    # 土 山·女·宀
+    "峻": ("lofty, noble", T), "媛": ("beauty, grace", T), "宙": ("cosmos, eternity", T),
+})
 
 
 @dataclass
@@ -131,6 +146,21 @@ SEED_NAMES: list[NameEntry] = [
     NameEntry("하윤", "F", "河潤"),
     NameEntry("서윤", "F", "瑞潤"),
     NameEntry("지윤", "F", "智潤"),
+    # 확장 2 (새 한자 포함)
+    NameEntry("예준", "M", "睿俊"),
+    NameEntry("태현", "M", "泰炫"),
+    NameEntry("현준", "M", "賢俊"),
+    NameEntry("시우", "M", "時宇"),
+    NameEntry("승우", "M", "昇宇"),
+    NameEntry("주원", "M", "宙源"),
+    NameEntry("지유", "F", "智柔"),
+    NameEntry("예원", "F", "睿媛"),
+    NameEntry("시아", "F", "詩娥"),
+    NameEntry("은서", "F", "恩瑞"),
+    NameEntry("윤아", "F", "潤娥"),
+    NameEntry("서현", "F", "瑞炫"),
+    NameEntry("예진", "F", "睿珍"),
+    NameEntry("수연", "F", "洙娟"),
 ]
 
 # 성(姓) 표: 발음오행은 코드로 계산. 인기순 근사 정렬.
