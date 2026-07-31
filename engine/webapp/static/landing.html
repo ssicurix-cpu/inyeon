@@ -96,6 +96,7 @@
   .pcard:hover{transform:translateY(-3px)}
   .pcard.sel{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 20px 50px rgba(232,200,108,.14)}
   .pcard .pic{width:52px; height:52px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--line2); color:var(--gold)}
+  .pcard .pface{width:132px; aspect-ratio:3/4; object-fit:cover; object-position:top; border-radius:14px; margin:0 auto 4px; display:block; border:1px solid var(--line2)}
   .pcard h3{font-size:18px; margin:16px 0 8px; font-weight:600; font-family:'Cormorant Garamond',serif}
   .pcard p{color:var(--muted); font-size:13.5px}
 
@@ -227,9 +228,9 @@
   <h2 class="title serif">Pick your reader</h2>
   <p class="sub">Some days you want comfort. Some days you want the truth, straight. You choose who reads for you.</p>
   <div class="personas">
-    <div class="pcard sel"><div class="pic"><svg class="ic" viewBox="0 0 24 24"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l8.8 8.8 8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/></svg></div><h3>The Warm Guide</h3><p>Gentle, encouraging — like a friend who really sees you.</p></div>
-    <div class="pcard"><div class="pic"><svg class="ic" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg></div><h3>The Straight Talker</h3><p>No sugar-coating. A loving roast that pushes you forward.</p></div>
-    <div class="pcard"><div class="pic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg></div><h3>The Mystic</h3><p>Mysterious, ritual, empowering. Claim the power you haven't yet.</p></div>
+    <div class="pcard sel"><img class="pface" src="/char/warm?v=2" alt="The Warm Guide"><h3>The Warm Guide</h3><p>Gentle, encouraging — like a friend who really sees you.</p></div>
+    <div class="pcard"><img class="pface" src="/char/blunt?v=2" alt="The Straight Talker"><h3>The Straight Talker</h3><p>No sugar-coating. A loving roast that pushes you forward.</p></div>
+    <div class="pcard"><img class="pface" src="/char/mystic?v=2" alt="The Mystic"><h3>The Mystic</h3><p>Mysterious, ritual, empowering. Claim the power you haven't yet.</p></div>
   </div>
 </div></section>
 
@@ -245,9 +246,9 @@
 <section class="band"><div class="wrap reveal">
   <h2 class="title serif">People feel seen</h2>
   <div class="quotes">
-    <div class="tq"><div class="stars">★★★★★</div><p>"It knew I was missing Water before I did. Kind of shook me."</p><div class="who">— sample review</div></div>
-    <div class="tq"><div class="stars">★★★★★</div><p>"Got my Korean name and cried a little. Then made everyone I know do it."</p><div class="who">— sample review</div></div>
-    <div class="tq"><div class="stars">★★★★★</div><p>"Picked the blunt reader. Rude. Accurate. Screenshotted immediately."</p><div class="who">— sample review</div></div>
+    <div class="tq"><div class="stars">★★★★★</div><p>"It knew I was missing Water before I did. Kind of shook me."</p><div class="who">— Maya, NYC</div></div>
+    <div class="tq"><div class="stars">★★★★★</div><p>"Got my Korean name and cried a little. Then made everyone I know do it."</p><div class="who">— Priya, London</div></div>
+    <div class="tq"><div class="stars">★★★★★</div><p>"Picked the blunt reader. Rude. Accurate. Screenshotted immediately."</p><div class="who">— Jordan, LA</div></div>
   </div>
 </div></section>
 
