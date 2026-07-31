@@ -90,6 +90,31 @@ def promo(n: int):
     return p.read_text(encoding="utf-8")
 
 
+_VID_BASE = "https://d8j0ntlcm91z4.cloudfront.net/user_3GGa0mUII1gOCwgWZmnTJH6OoHX/"
+_VIDS = {
+    "1": "hf_20260730_231609_bf324afc-b8fa-4551-a713-437c0e93ee9e.mp4",
+    "2": "hf_20260730_231629_c8435483-2332-4679-8842-fa91c0fbd421.mp4",
+    "3": "hf_20260730_233847_220e226c-afbf-4557-847d-5020abec711a.mp4",
+    "4": "hf_20260730_233850_cef9b9b6-e362-4c91-8a50-b8ee0c6f1300.mp4",
+    "5": "hf_20260730_233857_52fe5ff7-ed85-46ad-881f-c5790f77ae3a.mp4",
+    "6": "hf_20260730_233900_c2b63497-2cc0-4ae7-8f75-1ab83ecad634.mp4",
+}
+
+
+@app.get("/vid/{n}")
+def vid(n: str):
+    """Proxy the AI b-roll from CDN so hosted promo pages can embed it (avoids hotlink block)."""
+    from urllib.request import urlopen, Request
+    from fastapi.responses import Response
+    fn = _VIDS.get(n)
+    if not fn:
+        return Response(status_code=404)
+    req = Request(_VID_BASE + fn, headers={"User-Agent": "Mozilla/5.0"})
+    data = urlopen(req, timeout=30).read()
+    return Response(content=data, media_type="video/mp4",
+                    headers={"Cache-Control": "public, max-age=86400"})
+
+
 @app.post("/reading", response_class=HTMLResponse)
 def reading(date: str = Form(...), time: str = Form(...), city: str = Form(...),
             gender: str = Form("F"), persona: str = Form("warm"), name: str = Form(""),
