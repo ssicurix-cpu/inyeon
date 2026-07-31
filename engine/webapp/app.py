@@ -193,7 +193,7 @@ def api_name(name: str = "", date: str = "", gender: str = "F",
 # Gumroad products keyed by slug. Fill couple id/permalink after creating the $14.99 product.
 GUMROAD_PRODUCTS = {
     "name":   {"id": "CL2d7BPUIAPIXCW-6InKrg==", "permalink": "xivgqo"},
-    "couple": {"id": "",                          "permalink": "xouyd"},  # TODO: add product_id (permalink works as fallback)
+    "couple": {"id": "bD9FbDnHwMItl7uzrEsWPQ==", "permalink": "xouyd"},
 }
 
 
