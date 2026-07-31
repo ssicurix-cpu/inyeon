@@ -88,6 +88,7 @@ document.querySelectorAll('.readers .rcard').forEach(function(c){{
 
 
 _LANDING = (Path(__file__).parent / "static" / "landing.html").read_text(encoding="utf-8")
+_SIGNUP = (Path(__file__).parent / "static" / "signup.html").read_text(encoding="utf-8")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -103,6 +104,20 @@ def start():
 @app.get("/healthz")
 def healthz():
     return {"ok": True}
+
+
+@app.get("/api/lunar")
+def api_lunar(date: str, time: str = "12:00", city: str = "Seoul"):
+    """Lead magnet: lunar birthday + Korean zodiac from a birth date."""
+    dt = datetime.strptime(f"{date} {time or '12:00'}", "%Y-%m-%d %H:%M")
+    c = chart_for_city(dt, city)
+    return {"lunar": f"{c.lunar.year}-{c.lunar.month:02d}-{c.lunar.day:02d}",
+            "zodiac": c.zodiac.animal_en}
+
+
+@app.get("/signup", response_class=HTMLResponse)
+def signup():
+    return _SIGNUP
 
 
 _LEARN = (Path(__file__).parent / "static" / "learn.html").read_text(encoding="utf-8")

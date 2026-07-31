@@ -272,6 +272,9 @@
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
-<script>document.querySelectorAll(".btn").forEach(b=>b.addEventListener("click",()=>location.href="/start"));</script>
+<script>document.querySelectorAll(".btn").forEach(b=>b.addEventListener("click",()=>{
+  const t=b.textContent.toLowerCase();
+  location.href=(t.includes("sign")||t.includes("start free"))?"/signup":"/start";
+}));</script>
 </body>
 </html>

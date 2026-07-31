@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign up — your lunar birthday & Korean zodiac | Inyeon</title>
+<meta name="description" content="Sign up free and instantly get your lunar birthday and your true Korean zodiac animal (by 立春).">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6QNQRMT8FH"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6QNQRMT8FH');</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{background:#0a0b1a;color:#f1f0fb;font-family:'Inter',sans-serif;padding:30px 16px;margin:0}
+.card{max-width:440px;margin:0 auto;background:#161936;border:1px solid #2a2d55;border-radius:22px;padding:28px}
+h1{font-family:'Cormorant Garamond',serif;font-size:29px;font-weight:600;margin:0 0 4px;line-height:1.15}
+h1 em{color:#e8c86c;font-style:normal}
+.sub{color:#a9a8cc;font-size:14px;margin-bottom:20px}
+label{display:block;font-size:13px;color:#a9a8cc;margin:14px 0 6px}
+input,select{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d55;border-radius:10px;color:#f1f0fb;font-size:14px;box-sizing:border-box}
+.row{display:flex;gap:10px}.row>div{flex:1}
+button{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:22px;font-size:15px;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+.result{display:none;margin-top:22px;text-align:center;border-top:1px solid #2a2d55;padding-top:22px}
+.result .rk{font-family:'Cormorant Garamond',serif;font-size:16px;color:#a9a8cc}
+.result .rv{font-family:'Cormorant Garamond',serif;font-size:30px;color:#e8c86c;font-weight:600;margin:2px 0 14px}
+.result .zodiac{font-size:44px}
+.cta{display:inline-block;background:#e8c86c;color:#231b03;font-weight:600;padding:12px 22px;border-radius:40px;text-decoration:none;margin-top:16px;font-size:14px}
+.err{color:#ff8a9b;font-size:13px;margin-top:10px;text-align:center;display:none}
+.foot{max-width:440px;margin:14px auto 0;text-align:center;color:#6f6e93;font-size:11px}
+.note{font-size:11px;color:#6f6e93;margin-top:8px;line-height:1.5}
+</style></head>
+<body>
+<div class="card">
+  <h1>Sign up → your <em>lunar birthday</em> + Korean zodiac</h1>
+  <div class="sub">A little piece of Korea, instantly. Free.</div>
+  <div id="form">
+    <label>Email</label><input id="email" type="email" placeholder="you@email.com" required>
+    <div class="row">
+      <div><label>Birth date</label><input id="date" type="date" required></div>
+      <div><label>Time (optional)</label><input id="time" type="time"></div>
+    </div>
+    <label>Birth city</label>
+    <select id="city">
+      <option>Seoul</option><option>New York</option><option>Los Angeles</option>
+      <option>London</option><option>Paris</option><option>Tokyo</option><option>Sydney</option>
+    </select>
+    <button id="btn" type="button">Reveal my lunar birthday + zodiac</button>
+    <div class="err" id="err"></div>
+    <div class="note">By signing up you agree to receive occasional emails from Inyeon. For entertainment &amp; self-discovery.</div>
+  </div>
+  <div class="result" id="result">
+    <div class="zodiac" id="zi">🐾</div>
+    <div class="rk">Your Korean zodiac</div>
+    <div class="rv" id="zodiac">—</div>
+    <div class="rk">Your lunar birthday</div>
+    <div class="rv" id="lunar">—</div>
+    <a class="cta" href="/start">Now get your full free reading →</a>
+    <div class="note" style="margin-top:14px">Note: the Korean zodiac follows 立春 (start of spring), so early-Feb births may differ from the common New-Year rule.</div>
+  </div>
+</div>
+<p class="foot">© Inyeon · Korean saju &amp; compatibility · inyeon.onrender.com</p>
+<script>
+const SB_URL="https://oyqkhrlpdcsplxfflhee.supabase.co";
+const SB_KEY="sb_publishable_pUKM67uqaocpL06CIFm8UQ_Z42ApepG";
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const ZE={Rat:"🐭",Ox:"🐮",Tiger:"🐯",Rabbit:"🐰",Dragon:"🐲",Snake:"🐍",Horse:"🐴",Goat:"🐐",Sheep:"🐐",Monkey:"🐵",Rooster:"🐔",Dog:"🐶",Pig:"🐷",Boar:"🐷"};
+const btn=document.getElementById('btn'),err=document.getElementById('err');
+btn.onclick=async()=>{
+  const email=document.getElementById('email').value.trim();
+  const date=document.getElementById('date').value;
+  const time=document.getElementById('time').value||"12:00";
+  const city=document.getElementById('city').value;
+  err.style.display='none';
+  if(!email||!email.includes('@')){err.textContent='Please enter a valid email.';err.style.display='block';return;}
+  if(!date){err.textContent='Please enter your birth date.';err.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Reading the moon…';
+  try{
+    const r=await fetch(`/api/lunar?date=${date}&time=${time}&city=${encodeURIComponent(city)}`);
+    const j=await r.json();
+    try{ await sb.from('signups').insert({email,birth_date:date,birth_time:time,city,lunar:j.lunar,zodiac:j.zodiac}); }catch(e){}
+    document.getElementById('zodiac').textContent=j.zodiac;
+    document.getElementById('zi').textContent=ZE[j.zodiac]||"🌙";
+    document.getElementById('lunar').textContent=j.lunar;
+    document.getElementById('form').style.display='none';
+    document.getElementById('result').style.display='block';
+    gtag('event','sign_up',{method:'lead_magnet'});
+  }catch(e){
+    err.textContent='Something went wrong. Please try again.';err.style.display='block';
+    btn.disabled=false;btn.textContent='Reveal my lunar birthday + zodiac';
+  }
+};
+</script>
+</body></html>
