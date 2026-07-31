@@ -21,13 +21,16 @@ from .reading import PERSONA_MAP
 app = FastAPI(title="Inyeon — Korean Saju")
 
 _CITY_OPTS = "".join(f'<option>{c}</option>' for c in CITIES)
-_PERSONAS = [("warm", "The Warm Guide"), ("blunt", "The Straight Talker"), ("mystic", "The Mystic")]
+_PERSONAS = [("warm", "The Warm Guide", "Warm &amp; comforting"),
+             ("blunt", "The Straight Talker", "No sugar-coating"),
+             ("mystic", "The Mystic", "Mysterious &amp; knowing")]
 
 
 def _form_page() -> str:
     prad = "".join(
-        f'<label class="p"><input type="radio" name="persona" value="{k}"{" checked" if k=="warm" else ""}> {v}</label>'
-        for k, v in _PERSONAS)
+        f'<label class="rcard"><input type="radio" name="persona" value="{k}"{" checked" if k=="warm" else ""}>'
+        f'<img src="/char/{k}" alt="{v}" loading="lazy"><div class="rn">{v}</div><div class="rt">{t}</div></label>'
+        for k, v, t in _PERSONAS)
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Inyeon — your reading</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -40,6 +43,13 @@ label{{display:block;font-size:13px;color:#a9a8cc;margin:14px 0 6px}}
 input,select{{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d55;border-radius:10px;color:#f1f0fb;font-size:14px}}
 .p{{display:inline-flex;align-items:center;gap:6px;margin:6px 12px 0 0;color:#f1f0fb;font-size:13px}}
 .p input{{width:auto}}
+.readers{{display:flex;gap:8px;margin-top:6px}}
+.rcard{{flex:1;cursor:pointer;background:#0f1124;border:2px solid #2a2d55;border-radius:12px;padding:6px;text-align:center;transition:border-color .2s}}
+.rcard img{{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;display:block}}
+.rcard .rn{{font-size:11px;color:#f1f0fb;margin-top:5px;font-weight:600;line-height:1.2}}
+.rcard .rt{{font-size:9px;color:#a9a8cc;margin-top:2px}}
+.rcard input{{display:none}}
+.rcard:has(input:checked){{border-color:#e8c86c;box-shadow:0 0 0 1px #e8c86c}}
 .row{{display:flex;gap:10px}} .row>div{{flex:1}}
 button{{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:22px;font-size:15px;cursor:pointer}}
 details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}}
@@ -52,7 +62,7 @@ details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}
   <div><label>Time</label><input type="time" name="time" value="14:30" required></div></div>
   <label>Birth city</label><select name="city">{_CITY_OPTS}</select>
   <label>Gender (for name)</label><select name="gender"><option value="F">Female</option><option value="M">Male</option></select>
-  <label>Choose your reader</label><div>{prad}</div>
+  <label>Choose your reader</label><div class="readers">{prad}</div>
   <details><summary>+ Add someone for compatibility</summary>
     <div class="row"><div><label>Their birth date</label><input type="date" name="p_date"></div>
     <div><label>Time</label><input type="time" name="p_time"></div></div>
@@ -137,6 +147,25 @@ def vid(n: str, request: Request):
     return Response(content=data, media_type="video/mp4",
                     headers={"Accept-Ranges": "bytes", "Content-Length": str(total),
                              "Cache-Control": "public, max-age=86400"})
+
+
+_CHARS = {
+    "warm": "hf_20260731_040932_5f9c524d-a4b2-40e0-a021-bdd7bae0e91d.png",
+    "blunt": "hf_20260731_040711_b8696b33-aced-4aee-8ad6-0f0e60072ac5.png",
+    "mystic": "hf_20260731_040715_40b8a369-3e4d-4d59-a82e-672d263bec7c.png",
+}
+
+
+@app.get("/char/{key}")
+def char(key: str):
+    """Serve persona character art (proxied + cached from CDN)."""
+    from fastapi.responses import Response
+    fn = _CHARS.get(key)
+    if not fn:
+        return Response(status_code=404)
+    data = _fetch_vid(fn)
+    return Response(content=data, media_type="image/png",
+                    headers={"Cache-Control": "public, max-age=604800"})
 
 
 @app.post("/reading", response_class=HTMLResponse)

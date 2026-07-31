@@ -42,6 +42,9 @@ h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-he
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .chip{font-size:12px;border:1px solid var(--line);border-radius:30px;padding:5px 13px;color:var(--muted)}
 .badge{display:inline-block;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:30px;padding:4px 12px;margin-bottom:14px}
+.reader{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.reader img{width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid var(--gold)}
+.reader span{font-size:13px;color:var(--gold);letter-spacing:.02em}
 .hint{font-size:12px;color:var(--dim);line-height:1.55;margin-top:8px}
 .hint b{color:var(--muted);font-weight:500}
 .compat{margin-top:26px;border-top:1px solid var(--line);padding-top:22px}
@@ -98,8 +101,9 @@ def render_result(data: dict) -> str:
     who = data.get("name")
     title = f"{who}'s reading" if who else "Your reading"
 
+    pkey = (data.get("inputs") or {}).get("persona", "warm")
     html = [_PAGE_HEAD, '<div class="card">']
-    html.append(f'<div class="badge">{persona.label_en}</div>')
+    html.append(f'<div class="reader"><img src="/char/{pkey}" alt=""><span>Read by {persona.label_en}</span></div>')
     html.append(f'<div class="eyebrow">{title} · your day master</div>')
     html.append(f'<h1>{dm.polarity.en} {dm.element.en}<br><span style="font-size:22px;color:var(--muted)">{nature}</span></h1>')
     html.append(f'<div class="hint">Your <b>Day Master</b> is the core "you" in Korean saju — '
