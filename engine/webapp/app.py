@@ -89,12 +89,17 @@ input,select{{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d5
 .row{{display:flex;gap:10px}} .row>div{{flex:1}}
 button{{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:22px;font-size:15px;cursor:pointer}}
 details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}}
+.topbar{{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}}
+.brandlink{{font-family:'Cormorant Garamond',serif;font-size:20px;color:#f1f0fb;text-decoration:none;letter-spacing:.04em}}
+.closex{{color:#a9a8cc;text-decoration:none;font-size:26px;line-height:1;padding:0 8px;border-radius:8px}}
+.closex:hover{{background:#0f1124;color:#f1f0fb}}
 .acwrap{{position:relative}}
 .ac{{position:absolute;left:0;right:0;top:100%;z-index:30;background:#0f1124;border:1px solid #2a2d55;border-top:none;border-radius:0 0 10px 10px;max-height:210px;overflow:auto;display:none}}
 .ac div{{padding:10px 12px;font-size:14px;color:#f1f0fb;cursor:pointer;border-top:1px solid #1c1f3d}}
 .ac div:hover{{background:#1a1d3d}}
 </style></head><body>
 <form class="card" method="post" action="/reading">
+  <div class="topbar"><a href="/" class="brandlink">☾ Inyeon</a><a href="/" class="closex" title="Back to home">×</a></div>
   <h1>Discover your <em>Inyeon</em></h1>
   <div class="sub">Korean saju & compatibility · your missing element</div>
   <label>Your first name (optional)</label><input name="name" placeholder="Emma">
