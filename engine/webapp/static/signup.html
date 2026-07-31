@@ -26,6 +26,10 @@ button:disabled{opacity:.6;cursor:default}
 .err{color:#ff8a9b;font-size:13px;margin-top:10px;text-align:center;display:none}
 .foot{max-width:440px;margin:14px auto 0;text-align:center;color:#6f6e93;font-size:11px}
 .note{font-size:11px;color:#6f6e93;margin-top:8px;line-height:1.5}
+.acwrap{position:relative}
+.ac{position:absolute;left:0;right:0;top:100%;z-index:30;background:#0f1124;border:1px solid #2a2d55;border-top:none;border-radius:0 0 10px 10px;max-height:210px;overflow:auto;display:none}
+.ac div{padding:10px 12px;font-size:14px;color:#f1f0fb;cursor:pointer;border-top:1px solid #1c1f3d}
+.ac div:hover{background:#1a1d3d}
 </style></head>
 <body>
 <div class="card">
@@ -38,10 +42,8 @@ button:disabled{opacity:.6;cursor:default}
       <div><label>Time (optional)</label><input id="time" type="time"></div>
     </div>
     <label>Birth city</label>
-    <select id="city">
-      <option>Seoul</option><option>New York</option><option>Los Angeles</option>
-      <option>London</option><option>Paris</option><option>Tokyo</option><option>Sydney</option>
-    </select>
+    <div class="acwrap"><input id="city" value="Seoul, South Korea" placeholder="Type your city…" autocomplete="off"><div id="cityAC" class="ac"></div></div>
+    <input type="hidden" id="tz" value="Asia/Seoul"><input type="hidden" id="lng" value="126.978">
     <button id="btn" type="button">Reveal my lunar birthday + zodiac</button>
     <div class="err" id="err"></div>
     <div class="note">By signing up you agree to receive occasional emails from Inyeon. For entertainment &amp; self-discovery.</div>
@@ -63,17 +65,39 @@ const SB_KEY="sb_publishable_pUKM67uqaocpL06CIFm8UQ_Z42ApepG";
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
 const ZE={Rat:"🐭",Ox:"🐮",Tiger:"🐯",Rabbit:"🐰",Dragon:"🐲",Snake:"🐍",Horse:"🐴",Goat:"🐐",Sheep:"🐐",Monkey:"🐵",Rooster:"🐔",Dog:"🐶",Pig:"🐷",Boar:"🐷"};
 const btn=document.getElementById('btn'),err=document.getElementById('err');
+function attachAC(inId,acId,tzId,lngId){
+  var inp=document.getElementById(inId), ac=document.getElementById(acId), t;
+  inp.addEventListener('input',function(){
+    document.getElementById(tzId).value=''; document.getElementById(lngId).value='';
+    clearTimeout(t); var q=inp.value.trim();
+    if(q.length<2){ac.style.display='none';return;}
+    t=setTimeout(function(){
+      fetch('/api/cities?q='+encodeURIComponent(q)).then(function(r){return r.json();}).then(function(list){
+        ac.innerHTML='';
+        list.forEach(function(c){
+          var d=document.createElement('div'); d.textContent=c.label;
+          d.onclick=function(){inp.value=c.label;document.getElementById(tzId).value=c.tz;document.getElementById(lngId).value=c.lng;ac.style.display='none';};
+          ac.appendChild(d);
+        });
+        ac.style.display=list.length?'block':'none';
+      });
+    },200);
+  });
+  document.addEventListener('click',function(e){if(!ac.contains(e.target)&&e.target!==inp)ac.style.display='none';});
+}
+attachAC('city','cityAC','tz','lng');
 btn.onclick=async()=>{
   const email=document.getElementById('email').value.trim();
   const date=document.getElementById('date').value;
   const time=document.getElementById('time').value||"12:00";
   const city=document.getElementById('city').value;
+  const tz=document.getElementById('tz').value, lng=document.getElementById('lng').value;
   err.style.display='none';
   if(!email||!email.includes('@')){err.textContent='Please enter a valid email.';err.style.display='block';return;}
   if(!date){err.textContent='Please enter your birth date.';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Reading the moon…';
   try{
-    const r=await fetch(`/api/lunar?date=${date}&time=${time}&city=${encodeURIComponent(city)}`);
+    const r=await fetch(`/api/lunar?date=${date}&time=${time}&city=${encodeURIComponent(city)}&tz=${encodeURIComponent(tz)}&lng=${lng}`);
     const j=await r.json();
     try{ await sb.from('signups').insert({email,birth_date:date,birth_time:time,city,lunar:j.lunar,zodiac:j.zodiac}); }catch(e){}
     document.getElementById('zodiac').textContent=j.zodiac;

@@ -5,13 +5,14 @@ webapp.app — FastAPI 웹앱: 입력 폼 → 실제 엔진 계산 → 결과 �
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from saju.place import CITIES
+from saju.place import CITIES, chart_for_place
 from .reading import build_reading
 from .render import render_result
 from saju.place import chart_for_city
@@ -21,6 +22,38 @@ from .reading import PERSONA_MAP
 app = FastAPI(title="Inyeon — Korean Saju")
 
 _CITY_OPTS = "".join(f'<option>{c}</option>' for c in CITIES)
+_CITIES_DATA = json.loads((Path(__file__).parent / "static" / "cities.json").read_text(encoding="utf-8"))
+
+
+@app.get("/api/cities")
+def api_cities(q: str = ""):
+    """City search for autocomplete → [{label, tz, lng}] (population-ordered)."""
+    q = q.strip().lower()
+    if len(q) < 2:
+        return []
+    starts, contains = [], []
+    for c in _CITIES_DATA:
+        n = c["n"].lower()
+        if n.startswith(q):
+            starts.append(c)
+        elif q in n:
+            contains.append(c)
+        if len(starts) >= 12:
+            break
+    res = (starts + contains)[:12]
+    return [{"label": f'{c["n"]}, {c["c"]}', "tz": c["tz"], "lng": c["lng"]} for c in res]
+
+
+def _chart_tz(dt, tz, lng, city):
+    if tz and lng not in (None, ""):
+        try:
+            return chart_for_place(dt, tz, float(lng))
+        except Exception:
+            pass
+    try:
+        return chart_for_city(dt, city or "Seoul")
+    except Exception:
+        return chart_for_city(dt, "Seoul")
 _PERSONAS = [("warm", "The Warm Guide", "Warm &amp; comforting"),
              ("blunt", "The Straight Talker", "No sugar-coating"),
              ("mystic", "The Mystic", "Mysterious &amp; knowing")]
@@ -56,6 +89,10 @@ input,select{{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d5
 .row{{display:flex;gap:10px}} .row>div{{flex:1}}
 button{{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:22px;font-size:15px;cursor:pointer}}
 details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}}
+.acwrap{{position:relative}}
+.ac{{position:absolute;left:0;right:0;top:100%;z-index:30;background:#0f1124;border:1px solid #2a2d55;border-top:none;border-radius:0 0 10px 10px;max-height:210px;overflow:auto;display:none}}
+.ac div{{padding:10px 12px;font-size:14px;color:#f1f0fb;cursor:pointer;border-top:1px solid #1c1f3d}}
+.ac div:hover{{background:#1a1d3d}}
 </style></head><body>
 <form class="card" method="post" action="/reading">
   <h1>Discover your <em>Inyeon</em></h1>
@@ -63,13 +100,17 @@ details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}
   <label>Your first name (optional)</label><input name="name" placeholder="Emma">
   <div class="row"><div><label>Birth date</label><input type="date" name="date" value="1990-06-21" required></div>
   <div><label>Time</label><input type="time" name="time" value="14:30" required></div></div>
-  <label>Birth city</label><select name="city">{_CITY_OPTS}</select>
+  <label>Birth city</label>
+  <div class="acwrap"><input id="city" name="city" value="Seoul, South Korea" placeholder="Type your city…" autocomplete="off"><div id="cityAC" class="ac"></div></div>
+  <input type="hidden" name="tz" id="tz" value="Asia/Seoul"><input type="hidden" name="lng" id="lng" value="126.978">
   <label>Gender (for name)</label><select name="gender"><option value="F">Female</option><option value="M">Male</option></select>
   <label>Choose your reader</label><div class="readers">{prad}</div>
   <details><summary>+ Add someone for compatibility</summary>
     <div class="row"><div><label>Their birth date</label><input type="date" name="p_date"></div>
     <div><label>Time</label><input type="time" name="p_time"></div></div>
-    <label>Their city</label><select name="p_city"><option value=""></option>{_CITY_OPTS}</select>
+    <label>Their city</label>
+    <div class="acwrap"><input id="p_city" name="p_city" placeholder="Type their city…" autocomplete="off"><div id="p_cityAC" class="ac"></div></div>
+    <input type="hidden" name="p_tz" id="p_tz"><input type="hidden" name="p_lng" id="p_lng">
     <div class="row"><div><label>Their name (optional)</label><input name="p_name" placeholder="Jihoon"></div>
     <div><label>Their gender (for name)</label><select name="p_gender"><option value="M">Male</option><option value="F">Female</option></select></div></div>
   </details>
@@ -83,6 +124,28 @@ document.querySelectorAll('.readers .rcard').forEach(function(c){{
     var r=c.querySelector('input');if(r)r.checked=true;
   }});
 }});
+function attachAC(inId,acId,tzId,lngId){{
+  var inp=document.getElementById(inId), ac=document.getElementById(acId), t;
+  inp.addEventListener('input',function(){{
+    document.getElementById(tzId).value=''; document.getElementById(lngId).value='';
+    clearTimeout(t); var q=inp.value.trim();
+    if(q.length<2){{ac.style.display='none';return;}}
+    t=setTimeout(function(){{
+      fetch('/api/cities?q='+encodeURIComponent(q)).then(function(r){{return r.json();}}).then(function(list){{
+        ac.innerHTML='';
+        list.forEach(function(c){{
+          var d=document.createElement('div'); d.textContent=c.label;
+          d.onclick=function(){{inp.value=c.label;document.getElementById(tzId).value=c.tz;document.getElementById(lngId).value=c.lng;ac.style.display='none';}};
+          ac.appendChild(d);
+        }});
+        ac.style.display=list.length?'block':'none';
+      }});
+    }},200);
+  }});
+  document.addEventListener('click',function(e){{if(!ac.contains(e.target)&&e.target!==inp)ac.style.display='none';}});
+}}
+attachAC('city','cityAC','tz','lng');
+attachAC('p_city','p_cityAC','p_tz','p_lng');
 </script>
 </body></html>"""
 
@@ -107,10 +170,11 @@ def healthz():
 
 
 @app.get("/api/lunar")
-def api_lunar(date: str, time: str = "12:00", city: str = "Seoul"):
+def api_lunar(date: str, time: str = "12:00", city: str = "Seoul",
+              tz: str = "", lng: str = ""):
     """Lead magnet: lunar birthday + Korean zodiac from a birth date."""
     dt = datetime.strptime(f"{date} {time or '12:00'}", "%Y-%m-%d %H:%M")
-    c = chart_for_city(dt, city)
+    c = _chart_tz(dt, tz, lng, city)
     return {"lunar": f"{c.lunar.year}-{c.lunar.month:02d}-{c.lunar.day:02d}",
             "zodiac": c.zodiac.animal_en}
 
@@ -205,23 +269,26 @@ def char(key: str):
 
 
 @app.post("/reading", response_class=HTMLResponse)
-def reading(date: str = Form(...), time: str = Form(...), city: str = Form(...),
+def reading(date: str = Form(...), time: str = Form(...), city: str = Form(""),
             gender: str = Form("F"), persona: str = Form("warm"), name: str = Form(""),
+            tz: str = Form(""), lng: str = Form(""),
             p_date: str = Form(""), p_time: str = Form(""), p_city: str = Form(""),
-            p_name: str = Form(""), p_gender: str = Form("M")):
+            p_name: str = Form(""), p_gender: str = Form("M"),
+            p_tz: str = Form(""), p_lng: str = Form("")):
     dt = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
     partner = None
-    if p_date and p_time and p_city:
+    if p_date and p_time and (p_tz or p_city):
         partner = {"dt": datetime.strptime(f"{p_date} {p_time}", "%Y-%m-%d %H:%M"),
-                   "city": p_city, "name": p_name or None, "gender": p_gender}
-    data = build_reading(dt, city, gender, persona, name=name, partner=partner)
+                   "city": p_city, "name": p_name or None, "gender": p_gender,
+                   "tz": p_tz, "lng": p_lng}
+    data = build_reading(dt, city, gender, persona, name=name, partner=partner, tz=tz, lng=lng)
     return render_result(data)
 
 
 @app.post("/ask")
-def ask_route(date: str = Form(...), time: str = Form(...), city: str = Form(...),
+def ask_route(date: str = Form(...), time: str = Form(...), city: str = Form(""),
               persona: str = Form("warm"), question: str = Form(...),
-              gender: str = Form("F")):
+              gender: str = Form("F"), tz: str = Form(""), lng: str = Form("")):
     dt = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
-    chart = chart_for_city(dt, city)
+    chart = _chart_tz(dt, tz, lng, city)
     return JSONResponse(_ask(chart, question, PERSONA_MAP.get(persona)))
