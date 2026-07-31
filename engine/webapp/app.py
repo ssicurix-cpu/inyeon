@@ -88,7 +88,11 @@ input,select{{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d5
 .rcard.sel{{border-color:#e8c86c;box-shadow:0 0 0 1px #e8c86c}}
 .row{{display:flex;gap:10px}} .row>div{{flex:1}}
 button{{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:22px;font-size:15px;cursor:pointer}}
-details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}}
+details{{margin-top:20px}}
+summary{{list-style:none;color:#e8c86c;font-size:15px;font-weight:600;cursor:pointer;border:1px solid #e8c86c;border-radius:12px;padding:15px;text-align:center;background:rgba(232,200,108,.09);transition:background .2s}}
+summary::-webkit-details-marker{{display:none}}
+summary:hover{{background:rgba(232,200,108,.18)}}
+details[open] summary{{margin-bottom:8px}}
 .topbar{{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}}
 .brandlink{{font-family:'Cormorant Garamond',serif;font-size:20px;color:#f1f0fb;text-decoration:none;letter-spacing:.04em}}
 .closex{{color:#a9a8cc;text-decoration:none;font-size:26px;line-height:1;padding:0 8px;border-radius:8px}}
@@ -110,7 +114,7 @@ details{{margin-top:18px}} summary{{color:#e8c86c;font-size:13px;cursor:pointer}
   <input type="hidden" name="tz" id="tz" value="Asia/Seoul"><input type="hidden" name="lng" id="lng" value="126.978">
   <label>Gender (for name)</label><select name="gender"><option value="F">Female</option><option value="M">Male</option></select>
   <label>Choose your reader</label><div class="readers">{prad}</div>
-  <details><summary>+ Add someone for compatibility</summary>
+  <details><summary>💞 Add someone — check your compatibility</summary>
     <div class="row"><div><label>Their birth date</label><input type="date" name="p_date"></div>
     <div><label>Time</label><input type="time" name="p_time"></div></div>
     <label>Their city</label>
