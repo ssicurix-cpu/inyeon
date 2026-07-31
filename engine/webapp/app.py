@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from saju.place import CITIES
@@ -101,18 +101,42 @@ _VIDS = {
 }
 
 
+_VID_CACHE: dict[str, bytes] = {}
+
+
+def _fetch_vid(fn: str) -> bytes:
+    if fn not in _VID_CACHE:
+        from urllib.request import urlopen, Request
+        req = Request(_VID_BASE + fn, headers={"User-Agent": "Mozilla/5.0"})
+        _VID_CACHE[fn] = urlopen(req, timeout=30).read()
+    return _VID_CACHE[fn]
+
+
 @app.get("/vid/{n}")
-def vid(n: str):
-    """Proxy the AI b-roll from CDN so hosted promo pages can embed it (avoids hotlink block)."""
-    from urllib.request import urlopen, Request
+def vid(n: str, request: Request):
+    """Proxy the AI b-roll from CDN with HTTP Range support so browsers can play it."""
     from fastapi.responses import Response
+    import re
     fn = _VIDS.get(n)
     if not fn:
         return Response(status_code=404)
-    req = Request(_VID_BASE + fn, headers={"User-Agent": "Mozilla/5.0"})
-    data = urlopen(req, timeout=30).read()
+    data = _fetch_vid(fn)
+    total = len(data)
+    rng = request.headers.get("range")
+    if rng:
+        m = re.match(r"bytes=(\d+)-(\d*)", rng)
+        start = int(m.group(1))
+        end = int(m.group(2)) if m.group(2) else total - 1
+        end = min(end, total - 1)
+        chunk = data[start:end + 1]
+        return Response(content=chunk, status_code=206, media_type="video/mp4",
+                        headers={"Content-Range": f"bytes {start}-{end}/{total}",
+                                 "Accept-Ranges": "bytes",
+                                 "Content-Length": str(len(chunk)),
+                                 "Cache-Control": "public, max-age=86400"})
     return Response(content=data, media_type="video/mp4",
-                    headers={"Cache-Control": "public, max-age=86400"})
+                    headers={"Accept-Ranges": "bytes", "Content-Length": str(total),
+                             "Cache-Control": "public, max-age=86400"})
 
 
 @app.post("/reading", response_class=HTMLResponse)
