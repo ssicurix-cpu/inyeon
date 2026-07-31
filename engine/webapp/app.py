@@ -191,11 +191,17 @@ def api_name(name: str = "", date: str = "", gender: str = "F",
 
 
 _NAME_PAGE = (Path(__file__).parent / "static" / "name.html").read_text(encoding="utf-8")
+_CARD_PAGE = (Path(__file__).parent / "static" / "name_card.html").read_text(encoding="utf-8")
 
 
 @app.get("/name", response_class=HTMLResponse)
 def name_page():
     return _NAME_PAGE
+
+
+@app.get("/card", response_class=HTMLResponse)
+def card_page():
+    return _CARD_PAGE
 
 
 @app.get("/api/lunar")

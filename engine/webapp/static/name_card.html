@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Korean Name Card — Inyeon</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6QNQRMT8FH"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6QNQRMT8FH');</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{background:#0a0b1a;color:#f1f0fb;font-family:'Inter',sans-serif;padding:24px 16px;margin:0}
+.wrap{max-width:460px;margin:0 auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.brandlink{font-family:'Cormorant Garamond',serif;font-size:20px;color:#f1f0fb;text-decoration:none;letter-spacing:.04em}
+.closex{color:#a9a8cc;text-decoration:none;font-size:26px}
+.panel{background:#161936;border:1px solid #2a2d55;border-radius:20px;padding:22px}
+h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin:0 0 4px}
+h1 em{color:#e8c86c;font-style:normal}
+.sub{color:#a9a8cc;font-size:13px;margin-bottom:16px}
+label{display:block;font-size:13px;color:#a9a8cc;margin:12px 0 6px}
+input,select{width:100%;padding:11px;background:#0f1124;border:1px solid #2a2d55;border-radius:10px;color:#f1f0fb;font-size:14px;box-sizing:border-box}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.acwrap{position:relative}
+.ac{position:absolute;left:0;right:0;top:100%;z-index:30;background:#0f1124;border:1px solid #2a2d55;border-top:none;border-radius:0 0 10px 10px;max-height:200px;overflow:auto;display:none}
+.ac div{padding:10px 12px;font-size:14px;cursor:pointer;border-top:1px solid #1c1f3d}.ac div:hover{background:#1a1d3d}
+button{width:100%;background:#e8c86c;color:#231b03;font-weight:600;border:none;padding:14px;border-radius:40px;margin-top:18px;font-size:15px;cursor:pointer}
+button:disabled{opacity:.6}
+.err{color:#ff8a9b;font-size:13px;margin-top:10px;text-align:center;display:none}
+#out{display:none;margin-top:20px;text-align:center}
+#cv{width:100%;max-width:420px;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dl{display:inline-block;background:#e8c86c;color:#231b03;font-weight:600;padding:12px 24px;border-radius:40px;text-decoration:none;margin-top:14px;font-size:14px;cursor:pointer}
+.foot{text-align:center;color:#6f6e93;font-size:11px;margin-top:14px}
+</style></head>
+<body><div class="wrap">
+<div class="topbar"><a href="/" class="brandlink">☾ Inyeon</a><a href="/name" class="closex">×</a></div>
+<div class="panel" id="panel">
+  <h1>Your <em>Korean name card</em></h1>
+  <div class="sub">Enter your details — we'll craft your keepsake card to download.</div>
+  <label>Your first name</label><input id="name" placeholder="Emma">
+  <div class="row"><div><label>Birth date</label><input id="date" type="date"></div>
+  <div><label>Time (optional)</label><input id="time" type="time"></div></div>
+  <label>Birth city</label>
+  <div class="acwrap"><input id="city" value="Seoul, South Korea" autocomplete="off"><div id="cityAC" class="ac"></div></div>
+  <input type="hidden" id="tz" value="Asia/Seoul"><input type="hidden" id="lng" value="126.978">
+  <label>Gender (for the name)</label>
+  <select id="gender"><option value="F">Female</option><option value="M">Male</option></select>
+  <button id="btn" type="button">Create my name card</button>
+  <div class="err" id="err"></div>
+</div>
+<div id="out">
+  <canvas id="cv" width="1080" height="1350"></canvas><br>
+  <a class="dl" id="dl">⬇ Download my card (PNG)</a>
+  <div class="foot">Save it, share it, print it 🌙</div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function attachAC(inId,acId,tzId,lngId){var inp=$(inId),ac=$(acId),t;
+  inp.addEventListener('input',function(){$(tzId).value='';$(lngId).value='';clearTimeout(t);var q=inp.value.trim();if(q.length<2){ac.style.display='none';return;}
+    t=setTimeout(function(){fetch('/api/cities?q='+encodeURIComponent(q)).then(r=>r.json()).then(function(list){ac.innerHTML='';
+      list.forEach(function(c){var d=document.createElement('div');d.textContent=c.label;d.onclick=function(){inp.value=c.label;$(tzId).value=c.tz;$(lngId).value=c.lng;ac.style.display='none';};ac.appendChild(d);});
+      ac.style.display=list.length?'block':'none';});},200);});
+  document.addEventListener('click',function(e){if(!ac.contains(e.target)&&e.target!==inp)ac.style.display='none';});}
+attachAC('city','cityAC','tz','lng');
+
+function wrap(ctx,text,x,y,maxw,lh){var words=text.split(' '),line='',yy=y;
+  for(var i=0;i<words.length;i++){var test=line+words[i]+' ';if(ctx.measureText(test).width>maxw&&i>0){ctx.fillText(line.trim(),x,yy);line=words[i]+' ';yy+=lh;}else line=test;}
+  ctx.fillText(line.trim(),x,yy);return yy;}
+
+function draw(c){
+  const cv=$('cv'),ctx=cv.getContext('2d'),W=1080,H=1350;
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#12142c');g.addColorStop(1,'#0a0b18');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // gold frame
+  ctx.strokeStyle='rgba(232,200,108,.55)';ctx.lineWidth=3;ctx.strokeRect(40,40,W-80,H-80);
+  ctx.textAlign='center';
+  ctx.fillStyle='#e8c86c';ctx.font='600 40px "Cormorant Garamond"';ctx.fillText('☾  Inyeon',W/2,130);
+  ctx.fillStyle='#a9a8cc';ctx.font='600 26px Inter';ctx.fillText('YOUR KOREAN NAME',W/2,200);
+  // hangul
+  ctx.fillStyle='#e8c86c';ctx.font='800 210px "Nanum Myeongjo"';ctx.fillText(c.hangul,W/2,430);
+  if(c.hanja){ctx.fillStyle='#cfceea';ctx.font='700 66px "Nanum Myeongjo"';ctx.fillText(c.hanja,W/2,520);}
+  // divider
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(180,580);ctx.lineTo(W-180,580);ctx.stroke();
+  // breakdown rows
+  var y=650;(c.breakdown||[]).forEach(function(b){
+    ctx.textAlign='left';ctx.fillStyle='#f1f0fb';ctx.font='700 54px "Nanum Myeongjo"';ctx.fillText(b.char,180,y);
+    ctx.fillStyle='#a9a8cc';ctx.font='400 30px Inter';ctx.fillText(b.meaning||'',260,y-16);
+    ctx.textAlign='right';ctx.fillStyle='#8fe0bd';ctx.font='600 26px Inter';ctx.fillText(b.element?('자원오행 '+b.element):'',W-180,y-16);
+    y+=92;
+  });
+  ctx.textAlign='center';
+  // reasoning
+  ctx.fillStyle='#e4e3f5';ctx.font='italic 600 34px "Cormorant Garamond"';
+  wrap(ctx,c.reasoning_en||'',W/2,y+40,W-260,46);
+  // footer
+  ctx.fillStyle='rgba(232,200,108,.9)';ctx.font='500 28px Inter';ctx.fillText("what's your inyeon?  ·  inyeon.onrender.com",W/2,H-90);
+}
+
+$('btn').onclick=async()=>{
+  const name=$('name').value.trim(),date=$('date').value,time=$('time').value||'12:00',
+    city=$('city').value,tz=$('tz').value,lng=$('lng').value,gender=$('gender').value;
+  $('err').style.display='none';
+  if(!name||!date){$('err').textContent='Please enter your name and birth date.';$('err').style.display='block';return;}
+  $('btn').disabled=true;$('btn').textContent='Crafting…';
+  try{
+    const r=await fetch(`/api/name?name=${encodeURIComponent(name)}&date=${date}&time=${time}&city=${encodeURIComponent(city)}&tz=${encodeURIComponent(tz)}&lng=${lng}&gender=${gender}`);
+    const c=await r.json();
+    if(!c||!c.hangul){$('err').textContent='Could not craft a name — try a different time/city.';$('err').style.display='block';$('btn').disabled=false;$('btn').textContent='Create my name card';return;}
+    await document.fonts.ready; draw(c);
+    $('panel').style.display='none';$('out').style.display='block';
+    $('dl').onclick=function(){const a=document.createElement('a');a.download=(c.hangul||'inyeon')+'-korean-name.png';a.href=$('cv').toDataURL('image/png');a.click();gtag&&gtag('event','name_card_download');};
+    gtag&&gtag('event','name_card_created');
+  }catch(e){$('err').textContent='Something went wrong. Try again.';$('err').style.display='block';$('btn').disabled=false;$('btn').textContent='Create my name card';}
+};
+</script>
+</body></html>
