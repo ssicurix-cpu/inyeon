@@ -275,6 +275,11 @@
 <script>document.querySelectorAll(".btn").forEach(b=>b.addEventListener("click",()=>{
   const t=b.textContent.toLowerCase();
   location.href=(t.includes("sign")||t.includes("start free"))?"/signup":"/start";
+}));
+document.querySelectorAll(".pcard").forEach(c=>c.addEventListener("click",()=>{
+  document.querySelectorAll(".pcard").forEach(x=>x.classList.remove("sel"));
+  c.classList.add("sel");
+  setTimeout(()=>location.href="/start",250);
 }));</script>
 </body>
 </html>
