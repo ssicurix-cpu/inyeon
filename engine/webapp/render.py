@@ -201,7 +201,7 @@ def render_result(data: dict) -> str:
             html.append(f'<div class="hint">This tunes your <b>name-harmony layer</b>, not your birth-fixed fate — '
                         f'try it for fun. Above is your free preview.</div>')
             html.append('<a class="cta" style="margin-top:16px" '
-                        'href="https://975194505819.gumroad.com/l/COUPLE" target="_blank" rel="noopener">'
+                        'href="https://975194505819.gumroad.com/l/xouyd" target="_blank" rel="noopener">'
                         'Get your couple name card — $14.99 →</a>')
             html.append('</div>')
         html.append('</div>')
