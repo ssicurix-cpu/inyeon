@@ -18,6 +18,8 @@ _POLARITY_DESC = {"Yang": "bold, outward and active", "Yin": "soft, inward and r
 
 _PAGE_HEAD = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your Inyeon reading</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6QNQRMT8FH"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6QNQRMT8FH');</script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0a0b1a;--panel:#161936;--panel2:#1d2044;--line:#2a2d55;--gold:#e8c86c;--jade:#8fe0bd;--text:#f1f0fb;--muted:#a9a8cc;--dim:#7a7aa0}
