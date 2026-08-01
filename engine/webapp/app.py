@@ -304,6 +304,41 @@ def learn():
     return _LEARN
 
 
+from . import seo as _seo  # noqa: E402
+
+
+@app.get("/sitemap.xml")
+def sitemap_xml():
+    from fastapi.responses import Response
+    return Response(_seo.sitemap(), media_type="application/xml")
+
+
+@app.get("/robots.txt")
+def robots_txt():
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(_seo.robots())
+
+
+@app.get("/what-is-saju", response_class=HTMLResponse)
+def seo_what_is_saju():
+    return _seo.render("what-is-saju")
+
+
+@app.get("/missing-element", response_class=HTMLResponse)
+def seo_missing_element():
+    return _seo.render("missing-element")
+
+
+@app.get("/saju-compatibility", response_class=HTMLResponse)
+def seo_saju_compatibility():
+    return _seo.render("saju-compatibility")
+
+
+@app.get("/korean-name", response_class=HTMLResponse)
+def seo_korean_name():
+    return _seo.render("korean-name")
+
+
 @app.get("/promo/{n}", response_class=HTMLResponse)
 def promo(n: int):
     p = Path(__file__).parent / "static" / f"promo{n}.html"
